@@ -30,7 +30,7 @@ int HwAiWrapper::LoadModelFromFileSync(const std::string &model_name,
   manager = HIAI_MixModelManager_Create(nullptr);
 
   if (manager == nullptr) {
-    LOGE("creat manager failed.");
+    LOGE("create manager failed.");
     return -1;
   }
 

@@ -7,7 +7,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/hiai_benchmark_model/jni",
-                "${workspaceFolder}/ai_ddk_mixmodel_lib/include",
+                "${workspaceFolder}/ddk150/include",
                 "${NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
             ],
             "defines": [],
