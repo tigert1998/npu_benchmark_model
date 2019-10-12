@@ -1,16 +1,14 @@
 #include <iostream>
-#include "HIAIMixModel.h"
+
+#include "hw_ai_wrapper.h"
 
 using namespace std;
 
+HwAiWrapper wrapper;
+
 int main() {
-  HIAI_MixModelManager* modelMang = HIAI_MixModelManager_Create(nullptr);
-
-  if (modelMang) {
-    cout << "HIAI_MixModelManager_Create success" << endl;
-  }
-
-  HIAI_MixModelManager_Destroy(modelMang);
-
+  std::string model_name, model_path;
+  bool mix_flag;
+  wrapper.LoadModelFromFileSync(model_name, model_path, mix_flag);
   return 0;
 }

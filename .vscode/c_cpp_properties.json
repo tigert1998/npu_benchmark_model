@@ -1,0 +1,21 @@
+{
+    "env": {
+        "NDK_DIR": "/opt/ndk/20.0.5594570/"
+    },
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/hiai_benchmark_model/jni",
+                "${workspaceFolder}/ai_ddk_mixmodel_lib/include",
+                "${NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}

@@ -13,23 +13,22 @@ LOCAL_MODULE := main
 
 # LOCAL_CFLAGS += -D__ndk1=__1 \
 
-LOCAL_SRC_FILES :=  \
-	main.cc
-	# dlopen.cpp
-	# Get_NPU_Result_thread.cpp
+LOCAL_C_INCLUDES += $(HIAI_SDK_HOME)/include
+
+LOCAL_SRC_FILES := \
+	main.cc hw_ai_wrapper.cc
 
 $(warning " gbg LOCALPATH is $(HIAI_SDK_HOME)")
-	
+
 LOCAL_LDFLAGS += -Wl,-L $(HIAI_SDK_HOME)/lib64
 LOCAL_LDLIBS += \
 	-llog \
     -lhiai \
 		
 # LOCAL_C_INCLUDES  := $HIAI_SDK_HOME
-LOCAL_CPPFLAGS += -std=gnu++14 -frtti -fexceptions -lpthread  
+LOCAL_CPPFLAGS += -std=gnu++17 -frtti -fexceptions -lpthread  
 # LOCAL_CPPFLAGS += -std=gnu++14 -rpath -frtti -fexceptions -lpthread  -L $(HIAI_SDK_HOME)/lib64/
 # LOCAL_CPPFLAGS += -std=c++14 -rpath -frtti -fexceptions
 	
 # include $(BUILD_SHARED_LIBRARY)
-include $(BUILD_EXECUTABLE) 
-
+include $(BUILD_EXECUTABLE)
