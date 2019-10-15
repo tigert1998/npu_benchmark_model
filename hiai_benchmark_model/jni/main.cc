@@ -44,5 +44,12 @@ int main(int argc, char **argv) {
     return -1;
   }
   puts("[INFO] load successfully");
+
+  std::vector<std::vector<float>> data_buf(1);
+  data_buf[0].resize(3 * 299 * 299);
+  auto res = wrapper.RunModelSync(offline_model_name, data_buf);
+  printf("res->size() = %d, res->at[0].size() = %d\n", res->size(),
+         res->at(0).size());
+
   return 0;
 }

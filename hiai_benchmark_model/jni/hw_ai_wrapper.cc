@@ -12,17 +12,20 @@
 
 using std::nullopt;
 
-int HwAiWrapper::LoadModelFromFileSync(const std::string &model_name,
-                                       const std::string &model_path,
+int HwAiWrapper::LoadModelFromFileSync(const std::string &offline_model_name,
+                                       const std::string &offline_model_path,
                                        bool mix_flag) {
-  LOGI("[LoadModelFromFileSync] model_path = %s", model_path.c_str());
-  LOGI("[LoadModelFromFileSync] model_name = %s", model_name.c_str());
+  LOGI("[LoadModelFromFileSync] offline_model_path = %s",
+       offline_model_path.c_str());
+  LOGI("[LoadModelFromFileSync] offline_model_name = %s",
+       offline_model_name.c_str());
 
   model_buffer = HIAI_MixModelBuffer_Create_From_File(
-      model_name.c_str(), model_path.c_str(), HIAI_MIX_DEVPREF_LOW, mix_flag);
+      offline_model_name.c_str(), offline_model_path.c_str(),
+      HIAI_MIX_DEVPREF_LOW, mix_flag);
 
   if (model_buffer == nullptr) {
-    LOGI("mixModel is nullptr");
+    LOGI("model_buffer == nullptr");
     return -1;
   }
 
@@ -39,14 +42,14 @@ int HwAiWrapper::LoadModelFromFileSync(const std::string &model_name,
   LOGI("load model from file ret = %d", ret);
   if (ret == 0) {
     model_tensor_info =
-        HIAI_MixModel_GetModelTensorInfo(manager, model_name.c_str());
+        HIAI_MixModel_GetModelTensorInfo(manager, offline_model_name.c_str());
   }
 
   return ret;
 }
 
 std::optional<std::vector<std::vector<float>>> HwAiWrapper::RunModelSync(
-    const std::string &model_name,
+    const std::string &offline_model_name,
     const std::vector<std::vector<float>> &data_buff) {
   if (nullptr == manager || nullptr == model_tensor_info) {
     LOGE("please load model first");
@@ -128,7 +131,7 @@ std::optional<std::vector<std::vector<float>>> HwAiWrapper::RunModelSync(
 
   int ret = HIAI_MixModel_RunModel(
       manager, inputs, model_tensor_info->input_cnt, outputs,
-      model_tensor_info->output_cnt, 1000, model_name.c_str());
+      model_tensor_info->output_cnt, 1000, offline_model_name.c_str());
 
   LOGE("run model ret: %d", ret);
 
@@ -179,11 +182,11 @@ bool FileExists(const std::string &path) {
 
 bool HwAiWrapper::ModelCompatibilityProcessFromFile(
     std::string online_model, std::string online_model_parameter,
-    std::string framework, std::string offline_model, bool mix_flag) {
+    std::string framework, std::string offline_model_path, bool mix_flag) {
   LOGI("online_model = %s", online_model.c_str());
   LOGI("online_model_parameter = %s", online_model_parameter.c_str());
   LOGI("framework = %s", framework.c_str());
-  LOGI("offline_model = %s", offline_model.c_str());
+  LOGI("offline_model_path = %s", offline_model_path.c_str());
 
   HIAI_Mix_Framework model_framework;
   if (framework == "caffe") {
@@ -212,16 +215,16 @@ bool HwAiWrapper::ModelCompatibilityProcessFromFile(
   if (std::string(hiai_version) == "000.000.000.000") {
     result_code = NO_NPU;
   } else {
-    bool check = FileExists(offline_model) &&
+    bool check = FileExists(offline_model_path) &&
                  HIAI_CheckMixModelCompatibility_From_File(
-                     mix_model_manager, mix_flag, offline_model.c_str());
+                     mix_model_manager, mix_flag, offline_model_path.c_str());
     LOGI("check result = %d", check);
     if (check) {
       result_code = CHECK_MODEL_COMPATIBILITY_SUCCESS;
     } else {
       int res = HIAI_MixModel_BuildModel_FromPath(
           mix_model_manager, model_framework, online_model.c_str(),
-          online_model_parameter.c_str(), offline_model.c_str(), mix_flag);
+          online_model_parameter.c_str(), offline_model_path.c_str(), mix_flag);
       LOGI("HIAI_MixModel_BuildModel_FromPath() = %d", res);
       if (res != 0) {
         result_code = BUILD_ONLINE_MODEL_FAILED;
