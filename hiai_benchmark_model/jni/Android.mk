@@ -8,7 +8,7 @@ LOCAL_MODULE := main
 LOCAL_C_INCLUDES += $(DDK_PATH)/include
 
 LOCAL_SRC_FILES := \
-	main.cc hw_ai_wrapper.cc
+	main.cc hw_ai_wrapper.cc types.cc
 
 LOCAL_LDFLAGS += -Wl -L$(DDK_PATH)/lib64
 LOCAL_LDLIBS += \

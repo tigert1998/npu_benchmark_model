@@ -3,44 +3,39 @@
 
 #include <cstring>
 #include <map>
+#include <sstream>
 #include <string>
+
+#include "types.h"
 
 template <typename T>
 class Flag {
  public:
-  std::string name_;
-  T *data_;
+  std::string name, remark = "";
+  T *data;
 
-  Flag(const std::string &name, T *data) : name_(name), data_(data) {}
+  Flag(const std::string &name, T *data)
+      : name(name), data(data), default_value(*data) {}
 
-  bool Parse(const std::string &);
+  bool Parse(const std::string &str) {
+    try {
+      *data = ::Parse<T>(str);
+    } catch (...) {
+      return false;
+    }
+    return true;
+  }
+
+  std::string GetHelpInfo() const {
+    return "--" + name + "=" + ToString(default_value) + "\t" +
+           GetTypeString<T>() + "\t" + remark;
+  }
+
+  std::string GetDataInfo() const { return name + ": [" + ToString(*data) + "]"; }
+
+ private:
+  T default_value;
 };
-
-template <>
-bool Flag<std::string>::Parse(const std::string &str) {
-  *data_ = str;
-  return true;
-}
-
-template <>
-bool Flag<int32_t>::Parse(const std::string &str) {
-  try {
-    *data_ = std::stoi(str);
-  } catch (...) {
-    return false;
-  }
-  return true;
-}
-
-template <>
-bool Flag<float>::Parse(const std::string &str) {
-  try {
-    *data_ = std::stof(str);
-  } catch (...) {
-    return false;
-  }
-  return true;
-}
 
 class Flags {
  public:
@@ -67,6 +62,12 @@ class Flags {
       dic[key] = value;
     }
     auto ret = ParseRecursively(dic, flags...);
+    if (!ret) {
+      puts("Flags:");
+      PrintHelpInfoRecursively(flags...);
+    } else {
+      PrintDataInfoRecursively(flags...);
+    }
     return ret;
   }
 
@@ -74,7 +75,7 @@ class Flags {
   template <typename T, typename... Ts>
   static bool ParseRecursively(std::map<std::string, std::string> &dic,
                                Flag<T> flag, Flag<Ts>... flags) {
-    if (auto iter = dic.find(flag.name_); iter != dic.end()) {
+    if (auto iter = dic.find(flag.name); iter != dic.end()) {
       if (!flag.Parse(iter->second)) return false;
       dic.erase(iter);
     }
@@ -85,6 +86,22 @@ class Flags {
       const std::map<std::string, std::string> &dic) {
     return dic.empty();
   }
+
+  template <typename T, typename... Ts>
+  static void PrintHelpInfoRecursively(Flag<T> flag, Flag<Ts>... flags) {
+    printf("\t%s\n", flag.GetHelpInfo().c_str());
+    PrintHelpInfoRecursively(flags...);
+  }
+
+  inline static void PrintHelpInfoRecursively() {}
+
+  template <typename T, typename... Ts>
+  static void PrintDataInfoRecursively(Flag<T> flag, Flag<Ts>... flags) {
+    printf("%s\n", flag.GetDataInfo().c_str());
+    PrintDataInfoRecursively(flags...);
+  }
+
+  inline static void PrintDataInfoRecursively() {}
 };
 
 #endif

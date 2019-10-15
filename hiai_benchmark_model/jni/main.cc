@@ -10,15 +10,29 @@ using namespace std;
 HwAiWrapper wrapper;
 
 int main(int argc, char **argv) {
-  std::string model_name, model_path;
+  std::string offline_model_name, offline_model_path;
+  std::string online_model_path, online_model_parameter;
+  std::string framework = "tensorflow";
+  bool mix_flag;
 
-  if (!Flags::Parse(argc, argv, Flag<std::string>("model_name", &model_name),
-                    Flag<std::string>("model_path", &model_path))) {
+  if (!Flags::Parse(
+          argc, argv,
+          Flag<std::string>("offline_model_name", &offline_model_name),
+          Flag<std::string>("offline_model_path", &offline_model_path),
+          Flag<std::string>("online_model_path", &online_model_path),
+          Flag<std::string>("online_model_parameter", &online_model_parameter),
+          Flag<std::string>("framework", &framework),
+          Flag<bool>("mix_flag", &mix_flag))) {
     puts("[ERROR] invalid arguments");
     return -1;
   }
 
-  if (0 != wrapper.LoadModelFromFileSync(model_name, model_path, true)) {
+  bool use_npu = wrapper.ModelCompatibilityProcessFromFile(
+      online_model_path, online_model_parameter, framework, offline_model_path,
+      mix_flag);
+
+  if (0 != wrapper.LoadModelFromFileSync(offline_model_name, online_model_path,
+                                         true)) {
     puts("[ERROR] fail to load model");
     return -1;
   }
