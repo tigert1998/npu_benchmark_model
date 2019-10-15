@@ -22,6 +22,12 @@ class HwAiWrapper {
   std::optional<std::vector<std::vector<float>>> RunModelSync(
       const std::string &model_name,
       const std::vector<std::vector<float>> &data_buff);
+
+  bool ModelCompatibilityProcessFromFile(std::string online_model,
+                                         std::string online_model_parameter,
+                                         std::string framework,
+                                         std::string offline_model,
+                                         bool mix_flag);
 };
 
 #endif

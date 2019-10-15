@@ -1,9 +1,9 @@
 #ifndef COMMAND_LINE_FLAGS_H_
 #define COMMAND_LINE_FLAGS_H_
 
+#include <cstring>
 #include <map>
 #include <string>
-#include <cstring>
 
 template <typename T>
 class Flag {
@@ -23,7 +23,7 @@ bool Flag<std::string>::Parse(const std::string &str) {
 }
 
 template <>
-bool Flag<int>::Parse(const std::string &str) {
+bool Flag<int32_t>::Parse(const std::string &str) {
   try {
     *data_ = std::stoi(str);
   } catch (...) {
@@ -66,21 +66,24 @@ class Flags {
       }
       dic[key] = value;
     }
-    return ParseRecursively(dic, flags...);
+    auto ret = ParseRecursively(dic, flags...);
+    return ret;
   }
 
  private:
   template <typename T, typename... Ts>
-  static bool ParseRecursively(const std::map<std::string, std::string> &dic,
+  static bool ParseRecursively(std::map<std::string, std::string> &dic,
                                Flag<T> flag, Flag<Ts>... flags) {
     if (auto iter = dic.find(flag.name_); iter != dic.end()) {
-      flag.Parse(iter->second);
+      if (!flag.Parse(iter->second)) return false;
+      dic.erase(iter);
     }
     return ParseRecursively(dic, flags...);
   }
 
-  static bool ParseRecursively(const std::map<std::string, std::string> &dic) {
-    return true;
+  inline static bool ParseRecursively(
+      const std::map<std::string, std::string> &dic) {
+    return dic.empty();
   }
 };
 

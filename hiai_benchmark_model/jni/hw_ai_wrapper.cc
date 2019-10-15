@@ -152,3 +152,86 @@ std::optional<std::vector<std::vector<float>>> HwAiWrapper::RunModelSync(
 
   return result;
 }
+
+namespace {
+enum ResultCode {
+  CHECK_MODEL_COMPATIBILITY_SUCCESS = 0,
+  BUILD_ONLINE_MODEL_SUCCESS,
+  BUILD_ONLINE_MODEL_FAILED,
+  GENERATE_OFFLINE_MODEL_FAILED,
+  UNSUPPORT_FRAMEWORK,
+  INVALID_OFFLINE_MODEL,
+  INVALID_ONLINE_MODEL,
+  INVALID_ONLINE_MODEL_PARA,
+  CREATE_OFFLINE_MODEL_PATH_FAILED,
+  CREATE_MODELMANAGER_FAILED,
+  DL_OPEN_FAILD,
+  NO_NPU
+};
+
+bool FileExists(const std::string &path) {
+  FILE *fp = fopen(path.c_str(), "r+");
+  if (fp == nullptr) return false;
+  fclose(fp);
+  return true;
+}
+}  // namespace
+
+bool HwAiWrapper::ModelCompatibilityProcessFromFile(
+    std::string online_model, std::string online_model_parameter,
+    std::string framework, std::string offline_model, bool mix_flag) {
+  LOGI("online_model = %s", online_model.c_str());
+  LOGI("online_model_parameter = %s", online_model_parameter.c_str());
+  LOGI("framework = %s", framework.c_str());
+  LOGI("offline_model = %s", offline_model.c_str());
+
+  HIAI_Mix_Framework model_framework;
+  if (framework.compare("caffe") == 0) {
+    model_framework = HIAI_Mix_Framework::HIAI_MIX_FRAMEWORK_CAFFE;
+  } else if (framework.compare("caffe_8bit") == 0) {
+    model_framework = HIAI_Mix_Framework::HIAI_MIX_FRAMEWORK_CAFFE_8BIT;
+  } else if (framework.compare("tensorflow") == 0) {
+    model_framework = HIAI_Mix_Framework::HIAI_MIX_FRAMEWORK_TENSORFLOW;
+  } else if (framework.compare("tensorflow_8bit") == 0) {
+    model_framework = HIAI_Mix_Framework::HIAI_MIX_FRAMEWORK_TENSORFLOW_8BIT;
+  } else {
+    return false;
+  }
+
+  HIAI_MixModelManager *mix_model_manager =
+      HIAI_MixModelManager_Create(nullptr);
+  const char *hiai_version = HIAI_ModelManager_GetVersion(mix_model_manager);
+  LOGI("hiai_version = %s", hiai_version);
+  ResultCode result_code;
+  if (std::string(hiai_version).compare("000.000.000.000") == 0) {
+    result_code = NO_NPU;
+  } else {
+    bool check = FileExists(offline_model) &&
+                 HIAI_CheckMixModelCompatibility_From_File(
+                     mix_model_manager, mix_flag, offline_model.c_str());
+    LOGI("check result = %d", check);
+    if (check) {
+      result_code = CHECK_MODEL_COMPATIBILITY_SUCCESS;
+    } else {
+      int res = HIAI_MixModel_BuildModel_FromPath(
+          mix_model_manager, model_framework, online_model.c_str(),
+          online_model_parameter.c_str(), offline_model.c_str(), mix_flag);
+      LOGI("HIAI_MixModel_BuildModel_FromPath() = %d", res);
+      if (res != 0) {
+        result_code = BUILD_ONLINE_MODEL_FAILED;
+      } else {
+        result_code = BUILD_ONLINE_MODEL_SUCCESS;
+      }
+    }
+  }
+
+  LOGI("result_code = %d", result_code);
+  HIAI_MixModelManager_Destroy(mix_model_manager);
+
+  bool result = false;
+  if (result_code == CHECK_MODEL_COMPATIBILITY_SUCCESS ||
+      result_code == BUILD_ONLINE_MODEL_SUCCESS) {
+    result = true;
+  }
+  return result;
+}

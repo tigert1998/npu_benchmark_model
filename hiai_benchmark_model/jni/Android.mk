@@ -13,9 +13,7 @@ LOCAL_SRC_FILES := \
 LOCAL_LDFLAGS += -Wl -L$(DDK_PATH)/lib64
 LOCAL_LDLIBS += \
 	-lhiai \
-	-landroid \
-	-llog \
-	-ljnigraphics
+	-llog
 
 LOCAL_CPPFLAGS += -std=c++17 -frtti -fexceptions -lpthread  
 # LOCAL_CPPFLAGS += -std=gnu++14 -rpath -frtti -fexceptions -lpthread  -L $(DDK_PATH)/lib64/
