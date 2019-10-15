@@ -38,10 +38,11 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  if (0 != wrapper.LoadModelFromFileSync(offline_model_name, online_model_path,
-                                         true)) {
+  if (0 != wrapper.LoadModelFromFileSync(offline_model_name, offline_model_path,
+                                         mix_flag)) {
     puts("[ERROR] fail to load model");
     return -1;
   }
+  puts("[INFO] load successfully");
   return 0;
 }

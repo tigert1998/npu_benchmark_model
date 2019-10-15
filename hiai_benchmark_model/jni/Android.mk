@@ -8,16 +8,28 @@ LOCAL_SRC_FILES := $(DDK_RELATIVE_TO_JNI_PATH)/lib64/libhiai.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE := tensorflow_adapter
+LOCAL_SRC_FILES := $(DDK_RELATIVE_TO_JNI_PATH)/lib64/libtensorflow_adapter.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := tensorflow_inference
+LOCAL_SRC_FILES := $(DDK_RELATIVE_TO_JNI_PATH)/lib64/libtensorflow_inference.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
 
 LOCAL_MODULE := main
 
 LOCAL_C_INCLUDES += $(DDK_PATH)/include
 
 LOCAL_SHARED_LIBRARIES := hiai
+
 LOCAL_SRC_FILES := \
 	main.cc hw_ai_wrapper.cc types.cc
 
-LOCAL_LDFLAGS += -Wl -L$(DDK_PATH)/lib64
+LOCAL_LDFLAGS += \
+	-Wl,-L$(DDK_PATH)/lib64
 LOCAL_LDLIBS += \
 	-llog
 

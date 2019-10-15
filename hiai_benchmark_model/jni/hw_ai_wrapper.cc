@@ -202,7 +202,11 @@ bool HwAiWrapper::ModelCompatibilityProcessFromFile(
       HIAI_MixModelManager_Create(nullptr);
   LOGI("mix_model_manager %s nullptr",
        mix_model_manager == nullptr ? "==" : "!=");
-  const char *hiai_version = HIAI_ModelManager_GetVersion(mix_model_manager);
+
+  // FIXME
+  // const char *hiai_version = HIAI_ModelManager_GetVersion(mix_model_manager);
+  const char *hiai_version = "100.150.032.000";
+
   LOGI("hiai_version = %s", hiai_version);
   ResultCode result_code;
   if (std::string(hiai_version) == "000.000.000.000") {
