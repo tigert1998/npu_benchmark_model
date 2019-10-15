@@ -186,13 +186,13 @@ bool HwAiWrapper::ModelCompatibilityProcessFromFile(
   LOGI("offline_model = %s", offline_model.c_str());
 
   HIAI_Mix_Framework model_framework;
-  if (framework.compare("caffe") == 0) {
+  if (framework == "caffe") {
     model_framework = HIAI_Mix_Framework::HIAI_MIX_FRAMEWORK_CAFFE;
-  } else if (framework.compare("caffe_8bit") == 0) {
+  } else if (framework == "caffe_8bit") {
     model_framework = HIAI_Mix_Framework::HIAI_MIX_FRAMEWORK_CAFFE_8BIT;
-  } else if (framework.compare("tensorflow") == 0) {
+  } else if (framework == "tensorflow") {
     model_framework = HIAI_Mix_Framework::HIAI_MIX_FRAMEWORK_TENSORFLOW;
-  } else if (framework.compare("tensorflow_8bit") == 0) {
+  } else if (framework == "tensorflow_8bit") {
     model_framework = HIAI_Mix_Framework::HIAI_MIX_FRAMEWORK_TENSORFLOW_8BIT;
   } else {
     return false;
@@ -200,10 +200,12 @@ bool HwAiWrapper::ModelCompatibilityProcessFromFile(
 
   HIAI_MixModelManager *mix_model_manager =
       HIAI_MixModelManager_Create(nullptr);
+  LOGI("mix_model_manager %s nullptr",
+       mix_model_manager == nullptr ? "==" : "!=");
   const char *hiai_version = HIAI_ModelManager_GetVersion(mix_model_manager);
   LOGI("hiai_version = %s", hiai_version);
   ResultCode result_code;
-  if (std::string(hiai_version).compare("000.000.000.000") == 0) {
+  if (std::string(hiai_version) == "000.000.000.000") {
     result_code = NO_NPU;
   } else {
     bool check = FileExists(offline_model) &&
@@ -228,10 +230,6 @@ bool HwAiWrapper::ModelCompatibilityProcessFromFile(
   LOGI("result_code = %d", result_code);
   HIAI_MixModelManager_Destroy(mix_model_manager);
 
-  bool result = false;
-  if (result_code == CHECK_MODEL_COMPATIBILITY_SUCCESS ||
-      result_code == BUILD_ONLINE_MODEL_SUCCESS) {
-    result = true;
-  }
-  return result;
+  return result_code == CHECK_MODEL_COMPATIBILITY_SUCCESS ||
+         result_code == BUILD_ONLINE_MODEL_SUCCESS;
 }

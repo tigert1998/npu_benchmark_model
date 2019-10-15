@@ -5,4 +5,4 @@ APP_STL := c++_static
 # APP_STL := c++_static
 # APP_STL := gnustl_shared
 # APP_STL := stlport_shared
-APP_PLATFORM := android-26
+APP_PLATFORM := android-28
