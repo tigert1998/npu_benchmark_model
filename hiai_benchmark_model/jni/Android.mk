@@ -19,7 +19,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := main
+LOCAL_MODULE := hiai_benchmark_model
 
 LOCAL_C_INCLUDES += $(DDK_PATH)/include
 
