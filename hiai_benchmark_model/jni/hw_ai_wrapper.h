@@ -7,6 +7,11 @@
 
 #include "HIAIMixModel.h"
 
+struct InferenceResult {
+    double time_ms;
+    std::vector<std::vector<float>> data;
+};
+
 class HwAiWrapper {
  private:
   HIAI_MixModelManager *manager = nullptr;
@@ -20,7 +25,7 @@ class HwAiWrapper {
                             const std::string &offline_model_path,
                             bool mix_flag);
 
-  std::optional<std::vector<std::vector<float>>> RunModelSync(
+  std::optional<InferenceResult> RunModelSync(
       const std::string &offline_model_name,
       const std::vector<std::vector<float>> &data_buff);
 

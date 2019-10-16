@@ -1,11 +1,12 @@
 #include "hw_ai_wrapper.h"
 
 #include <android/log.h>
-#include <sys/time.h>
+
+#include <chrono>
 #include <cstring>
 #include <memory>
 
-#define LOG_TAG "SYNC_DDK_MSG"
+#define LOG_TAG "DDK_WRAPPER_MSG"
 
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -48,7 +49,7 @@ int HwAiWrapper::LoadModelFromFileSync(const std::string &offline_model_name,
   return ret;
 }
 
-std::optional<std::vector<std::vector<float>>> HwAiWrapper::RunModelSync(
+std::optional<InferenceResult> HwAiWrapper::RunModelSync(
     const std::string &offline_model_name,
     const std::vector<std::vector<float>> &data_buff) {
   if (nullptr == manager || nullptr == model_tensor_info) {
@@ -125,15 +126,19 @@ std::optional<std::vector<std::vector<float>>> HwAiWrapper::RunModelSync(
     memcpy(in_data, data_buff[i].data(), size);
   }
 
-  float time_use;
-  struct timeval tpstart, tpend;
-  gettimeofday(&tpstart, nullptr);
-
-  int ret = HIAI_MixModel_RunModel(
-      manager, inputs, model_tensor_info->input_cnt, outputs,
-      model_tensor_info->output_cnt, 1000, offline_model_name.c_str());
-
-  LOGE("run model ret: %d", ret);
+  double time_ms;
+  {
+    auto from_time = std::chrono::high_resolution_clock::now();
+    int ret = HIAI_MixModel_RunModel(
+        manager, inputs, model_tensor_info->input_cnt, outputs,
+        model_tensor_info->output_cnt, 1000, offline_model_name.c_str());
+    auto to_time = std::chrono::high_resolution_clock::now();
+    time_ms = std::chrono::duration_cast<std::chrono::microseconds>(to_time -
+                                                                    from_time)
+                  .count() /
+              1000.;
+    LOGE("run model ret: %d", ret);
+  }
 
   std::vector<std::vector<float>> result(model_tensor_info->output_cnt);
   for (int o = 0; o < model_tensor_info->output_cnt; o++) {
@@ -153,7 +158,7 @@ std::optional<std::vector<std::vector<float>>> HwAiWrapper::RunModelSync(
     output_tensor = nullptr;
   }
 
-  return result;
+  return {{.time_ms = time_ms, .data = result}};
 }
 
 namespace {

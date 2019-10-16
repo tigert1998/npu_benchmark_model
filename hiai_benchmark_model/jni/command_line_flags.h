@@ -16,6 +16,8 @@ class Flag {
 
   Flag(const std::string &name, T *data)
       : name(name), data(data), default_value(*data) {}
+  Flag(const std::string &name, T *data, const std::string &remark)
+      : name(name), data(data), default_value(*data), remark(remark) {}
 
   bool Parse(const std::string &str) {
     try {
@@ -31,7 +33,9 @@ class Flag {
            GetTypeString<T>() + "\t" + remark;
   }
 
-  std::string GetDataInfo() const { return name + ": [" + ToString(*data) + "]"; }
+  std::string GetDataInfo() const {
+    return name + ": [" + ToString(*data) + "]";
+  }
 
  private:
   T default_value;
