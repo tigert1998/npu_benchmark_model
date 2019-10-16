@@ -8,8 +8,8 @@
 #include "HIAIMixModel.h"
 
 struct InferenceResult {
-    double time_ms;
-    std::vector<std::vector<float>> data;
+  double time_ms;
+  std::vector<std::vector<float>> data;
 };
 
 class HwAiWrapper {
@@ -21,6 +21,8 @@ class HwAiWrapper {
   HIAI_MixModelTensorInfo *model_tensor_info = nullptr;
 
  public:
+  std::string GetTfVersion() const;
+
   int LoadModelFromFileSync(const std::string &offline_model_name,
                             const std::string &offline_model_path,
                             bool mix_flag);
@@ -35,7 +37,7 @@ class HwAiWrapper {
                                          std::string offline_model_path,
                                          bool mix_flag);
 
-                                         std::vector<std::vector<float>> GenerateCnnRandomInput();
+  std::vector<std::vector<float>> GenerateCnnRandomInput();
 };
 
 #endif

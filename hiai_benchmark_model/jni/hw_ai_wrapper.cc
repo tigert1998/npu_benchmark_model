@@ -2,6 +2,7 @@
 
 #include <android/log.h>
 
+#include <dlfcn.h>
 #include <chrono>
 #include <cstring>
 #include <memory>
@@ -258,4 +259,10 @@ bool HwAiWrapper::ModelCompatibilityProcessFromFile(
 
   return result_code == CHECK_MODEL_COMPATIBILITY_SUCCESS ||
          result_code == BUILD_ONLINE_MODEL_SUCCESS;
+}
+
+std::string HwAiWrapper::GetTfVersion() const {
+  auto handle = dlopen("libtensorflow_inference.so", RTLD_LOCAL | RTLD_LAZY);
+  auto fptr = (const char *(*)())dlsym(handle, "TF_Version");
+  return fptr();
 }
