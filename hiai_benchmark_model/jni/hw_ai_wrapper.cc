@@ -49,6 +49,20 @@ int HwAiWrapper::LoadModelFromFileSync(const std::string &offline_model_name,
   return ret;
 }
 
+std::vector<std::vector<float>> HwAiWrapper::GenerateCnnRandomInput() {
+  std::vector<std::vector<float>> ret;
+  ret.resize(model_tensor_info->input_cnt);
+  int in_n, in_c, in_h, in_w;
+  for (int i = 0, pos = 0; i < model_tensor_info->input_cnt; ++i) {
+    in_n = model_tensor_info->input_shape[pos++];
+    in_c = model_tensor_info->input_shape[pos++];
+    in_h = model_tensor_info->input_shape[pos++];
+    in_w = model_tensor_info->input_shape[pos++];
+    ret[i].resize(in_n * in_c * in_h * in_w);
+  }
+  return ret;
+}
+
 std::optional<InferenceResult> HwAiWrapper::RunModelSync(
     const std::string &offline_model_name,
     const std::vector<std::vector<float>> &data_buff) {

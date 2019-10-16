@@ -34,6 +34,8 @@ class HwAiWrapper {
                                          std::string framework,
                                          std::string offline_model_path,
                                          bool mix_flag);
+
+                                         std::vector<std::vector<float>> GenerateCnnRandomInput();
 };
 
 #endif
