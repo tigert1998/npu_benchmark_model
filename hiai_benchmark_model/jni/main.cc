@@ -24,17 +24,18 @@ void Benchmark(const std::string &offline_model_name, int32_t num_runs,
 
   for (int i = 0;
        i < num_runs ||
-       to_time - from_time < std::chrono::milliseconds((int)min_secs * 1000);
+       to_time - from_time < std::chrono::milliseconds((int)(min_secs * 1000));
        i++) {
     if (run_delay > 0 && !is_warmup) {
       std::this_thread::sleep_for(
-          std::chrono::milliseconds((int32_t)run_delay * 1000));
+          std::chrono::milliseconds((int32_t)(run_delay * 1000)));
     }
     auto res = wrapper.RunModelSync(offline_model_name, data_buf);
     stat.UpdateStat(res->time_ms);
 
     to_time = std::chrono::high_resolution_clock::now();
-    if (to_time - from_time >= std::chrono::milliseconds((int)max_secs * 1000))
+    if (to_time - from_time >=
+        std::chrono::milliseconds((int)(max_secs * 1000)))
       break;
   }
   cout << stat << "\n\n";
