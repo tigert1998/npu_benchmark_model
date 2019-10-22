@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  printf("TF_Version() = %s\n", wrapper.GetTfVersion().c_str());
+  printf("TF_Version() = %s\n", HwAiWrapper::GetTfVersion().c_str());
 
   bool use_npu = wrapper.ModelCompatibilityProcessFromFile(
       online_model_path, online_model_parameter, framework, offline_model_path,

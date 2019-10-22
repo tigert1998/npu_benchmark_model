@@ -1,6 +1,7 @@
 {
     "env": {
-        "NDK_DIR": "/opt/ndk/20.0.5594570/"
+        "LINUX_NDK_DIR": "/opt/ndk/20.0.5594570/",
+        "WINDOWS_NDK_DIR": "~\\AppData\\Local\\Android\\Sdk\\ndk-bundle\\"
     },
     "configurations": [
         {
@@ -8,13 +9,32 @@
             "includePath": [
                 "${workspaceFolder}/hiai_benchmark_model/jni",
                 "${workspaceFolder}/ddk150/include",
-                "${NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
+                "${LINUX_NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
+        },
+        {
+            "name": "Win32",
+            "compilerPath": "${WINDOWS_NDK_DIR}\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe",
+            "includePath": [
+                "${WINDOWS_NDK_DIR}\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\include",
+                "${WINDOWS_NDK_DIR}\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\local\\include",
+                "${workspaceFolder}\\hiai_benchmark_model\\jni",
+                "${workspaceFolder}\\ddk150\\include",
+                "${WINDOWS_NDK_DIR}\\sources\\cxx-stl\\llvm-libc++\\include",
+                "${WINDOWS_NDK_DIR}\\sources\\cxx-stl\\llvm-libc++abi\\include",
+                "${WINDOWS_NDK_DIR}\\sysroot\\usr\\include\\arm-linux-androideabi"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64",
+            "forcedInclude": [
+                "${workspaceFolder}/.vscode/undefines.h"
+            ]
         }
     ],
     "version": 4

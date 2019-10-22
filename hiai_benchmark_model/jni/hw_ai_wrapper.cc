@@ -261,7 +261,7 @@ bool HwAiWrapper::ModelCompatibilityProcessFromFile(
          result_code == BUILD_ONLINE_MODEL_SUCCESS;
 }
 
-std::string HwAiWrapper::GetTfVersion() const {
+std::string HwAiWrapper::GetTfVersion() {
   auto handle = dlopen("libtensorflow_inference.so", RTLD_LOCAL | RTLD_LAZY);
   auto fptr = (const char *(*)())dlsym(handle, "TF_Version");
   return fptr();

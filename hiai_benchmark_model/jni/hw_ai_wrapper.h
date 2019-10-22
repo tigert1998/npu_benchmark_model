@@ -21,7 +21,7 @@ class HwAiWrapper {
   HIAI_MixModelTensorInfo *model_tensor_info = nullptr;
 
  public:
-  std::string GetTfVersion() const;
+  static std::string GetTfVersion();
 
   int LoadModelFromFileSync(const std::string &offline_model_name,
                             const std::string &offline_model_path,
