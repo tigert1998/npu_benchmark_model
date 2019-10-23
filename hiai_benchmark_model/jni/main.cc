@@ -4,12 +4,12 @@
 #include <thread>
 
 #include "command_line_flags.h"
-#include "hw_ai_wrapper.h"
+#include "mix_model_manager_wrapper.h"
 #include "stat.h"
 
 using std::cout;
 
-HwAiWrapper wrapper;
+MixModelManagerWrapper wrapper;
 
 void Benchmark(const std::string &offline_model_name, int32_t num_runs,
                float min_secs, float max_secs, float run_delay,
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  printf("TF_Version() = %s\n", HwAiWrapper::GetTfVersion().c_str());
+  printf("TF_Version() = %s\n", MixModelManagerWrapper::GetTfVersion().c_str());
 
   bool use_npu = wrapper.ModelCompatibilityProcessFromFile(
       online_model_path, online_model_parameter, framework, offline_model_path,

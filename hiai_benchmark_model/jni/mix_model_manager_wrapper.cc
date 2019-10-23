@@ -1,4 +1,4 @@
-#include "hw_ai_wrapper.h"
+#include "mix_model_manager_wrapper.h"
 
 #include <android/log.h>
 
@@ -7,16 +7,16 @@
 #include <cstring>
 #include <memory>
 
-#define LOG_TAG "DDK_WRAPPER_MSG"
+#define LOG_TAG "MIX_MODEL_MANAGER_WRAPPER_MSG"
 
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
 using std::nullopt;
 
-int HwAiWrapper::LoadModelFromFileSync(const std::string &offline_model_name,
-                                       const std::string &offline_model_path,
-                                       bool mix_flag) {
+int MixModelManagerWrapper::LoadModelFromFileSync(
+    const std::string &offline_model_name,
+    const std::string &offline_model_path, bool mix_flag) {
   LOGI("[LoadModelFromFileSync] offline_model_path = %s",
        offline_model_path.c_str());
   LOGI("[LoadModelFromFileSync] offline_model_name = %s",
@@ -50,7 +50,8 @@ int HwAiWrapper::LoadModelFromFileSync(const std::string &offline_model_name,
   return ret;
 }
 
-std::vector<std::vector<float>> HwAiWrapper::GenerateCnnRandomInput() {
+std::vector<std::vector<float>>
+MixModelManagerWrapper::GenerateCnnRandomInput() {
   std::vector<std::vector<float>> ret;
   ret.resize(model_tensor_info->input_cnt);
   int in_n, in_c, in_h, in_w;
@@ -64,7 +65,7 @@ std::vector<std::vector<float>> HwAiWrapper::GenerateCnnRandomInput() {
   return ret;
 }
 
-std::optional<InferenceResult> HwAiWrapper::RunModelSync(
+std::optional<InferenceResult> MixModelManagerWrapper::RunModelSync(
     const std::string &offline_model_name,
     const std::vector<std::vector<float>> &data_buff) {
   if (nullptr == manager || nullptr == model_tensor_info) {
@@ -200,7 +201,7 @@ bool FileExists(const std::string &path) {
 }
 }  // namespace
 
-bool HwAiWrapper::ModelCompatibilityProcessFromFile(
+bool MixModelManagerWrapper::ModelCompatibilityProcessFromFile(
     std::string online_model, std::string online_model_parameter,
     std::string framework, std::string offline_model_path, bool mix_flag) {
   LOGI("online_model = %s", online_model.c_str());
@@ -261,7 +262,7 @@ bool HwAiWrapper::ModelCompatibilityProcessFromFile(
          result_code == BUILD_ONLINE_MODEL_SUCCESS;
 }
 
-std::string HwAiWrapper::GetTfVersion() {
+std::string MixModelManagerWrapper::GetTfVersion() {
   auto handle = dlopen("libtensorflow_inference.so", RTLD_LOCAL | RTLD_LAZY);
   auto fptr = (const char *(*)())dlsym(handle, "TF_Version");
   return fptr();

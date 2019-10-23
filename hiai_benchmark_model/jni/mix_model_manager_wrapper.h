@@ -1,5 +1,5 @@
-#ifndef HW_AI_WRAPPER_H_
-#define HW_AI_WRAPPER_H_
+#ifndef MIX_MODEL_MANAGER_WRAPPER_H_
+#define MIX_MODEL_MANAGER_WRAPPER_H_
 
 #include <optional>
 #include <string>
@@ -7,12 +7,9 @@
 
 #include "HIAIMixModel.h"
 
-struct InferenceResult {
-  double time_ms;
-  std::vector<std::vector<float>> data;
-};
+#include "inference_result.h"
 
-class HwAiWrapper {
+class MixModelManagerWrapper {
  private:
   HIAI_MixModelManager *manager = nullptr;
   HIAI_MixTensorBuffer *input_tensor = nullptr;

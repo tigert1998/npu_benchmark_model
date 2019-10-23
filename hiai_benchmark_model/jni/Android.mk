@@ -26,7 +26,7 @@ LOCAL_C_INCLUDES += $(DDK_PATH)/include
 LOCAL_SHARED_LIBRARIES := hiai
 
 LOCAL_SRC_FILES := \
-	main.cc hw_ai_wrapper.cc types.cc
+	main.cc mix_model_manager_wrapper.cc types.cc
 
 LOCAL_LDFLAGS += \
 	-Wl,-L$(DDK_PATH)/lib64
