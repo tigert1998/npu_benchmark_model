@@ -147,12 +147,13 @@ std::optional<InferenceResult> MixModelManagerWrapper::RunModelSync(
     auto from_time = std::chrono::high_resolution_clock::now();
     int ret = HIAI_MixModel_RunModel(
         manager, inputs, model_tensor_info->input_cnt, outputs,
-        model_tensor_info->output_cnt, 1000, offline_model_name.c_str());
+        model_tensor_info->output_cnt, std::numeric_limits<uint32_t>::max(),
+        offline_model_name.c_str());
     auto to_time = std::chrono::high_resolution_clock::now();
-    time_ms = std::chrono::duration_cast<std::chrono::microseconds>(to_time -
-                                                                    from_time)
+    time_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(to_time -
+                                                                   from_time)
                   .count() /
-              1000.;
+              1e6;
     LOGE("run model ret: %d", ret);
   }
 
