@@ -9,7 +9,7 @@
 
 using std::cout;
 
-MixModelManagerWrapper wrapper;
+MixModelManagerWrapper mix_model_manager_wrapper;
 
 void Benchmark(const std::string &offline_model_name, int32_t num_runs,
                float min_secs, float max_secs, float run_delay,
@@ -17,7 +17,7 @@ void Benchmark(const std::string &offline_model_name, int32_t num_runs,
   Stat<double> stat;
   printf("Running benchmark for around %d iterations%s.\n", num_runs,
          is_warmup ? " in warmup stage" : "");
-  auto data_buf = wrapper.GenerateCnnRandomInput();
+  auto data_buf = mix_model_manager_wrapper.GenerateCnnRandomInput();
 
   auto from_time = std::chrono::high_resolution_clock::now();
   decltype(from_time) to_time = from_time;
@@ -30,7 +30,8 @@ void Benchmark(const std::string &offline_model_name, int32_t num_runs,
       std::this_thread::sleep_for(
           std::chrono::milliseconds((int32_t)(run_delay * 1000)));
     }
-    auto res = wrapper.RunModelSync(offline_model_name, data_buf);
+    auto res =
+        mix_model_manager_wrapper.RunModelSync(offline_model_name, data_buf);
     stat.UpdateStat(res->time_ms);
 
     to_time = std::chrono::high_resolution_clock::now();
@@ -80,7 +81,7 @@ int main(int argc, char **argv) {
 
   printf("TF_Version() = %s\n", MixModelManagerWrapper::GetTfVersion().c_str());
 
-  bool use_npu = wrapper.ModelCompatibilityProcessFromFile(
+  bool use_npu = mix_model_manager_wrapper.ModelCompatibilityProcessFromFile(
       online_model_path, online_model_parameter, framework, offline_model_path,
       mix_flag);
   printf("use_npu = %s\n", ToString(use_npu).c_str());
@@ -91,8 +92,8 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  if (0 != wrapper.LoadModelFromFileSync(offline_model_name, offline_model_path,
-                                         mix_flag)) {
+  if (0 != mix_model_manager_wrapper.LoadModelFromFileSync(
+               offline_model_name, offline_model_path, mix_flag)) {
     puts("[ERROR] fail to load model");
     return -1;
   }

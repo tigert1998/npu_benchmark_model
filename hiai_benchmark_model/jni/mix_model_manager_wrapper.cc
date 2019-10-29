@@ -7,6 +7,8 @@
 #include <cstring>
 #include <memory>
 
+#include "util.h"
+
 #define LOG_TAG "MIX_MODEL_MANAGER_WRAPPER_MSG"
 
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
@@ -177,30 +179,6 @@ std::optional<InferenceResult> MixModelManagerWrapper::RunModelSync(
 
   return {{.time_ms = time_ms, .data = result}};
 }
-
-namespace {
-enum ResultCode {
-  CHECK_MODEL_COMPATIBILITY_SUCCESS = 0,
-  BUILD_ONLINE_MODEL_SUCCESS,
-  BUILD_ONLINE_MODEL_FAILED,
-  GENERATE_OFFLINE_MODEL_FAILED,
-  UNSUPPORT_FRAMEWORK,
-  INVALID_OFFLINE_MODEL,
-  INVALID_ONLINE_MODEL,
-  INVALID_ONLINE_MODEL_PARA,
-  CREATE_OFFLINE_MODEL_PATH_FAILED,
-  CREATE_MODELMANAGER_FAILED,
-  DL_OPEN_FAILD,
-  NO_NPU
-};
-
-bool FileExists(const std::string &path) {
-  FILE *fp = fopen(path.c_str(), "r+");
-  if (fp == nullptr) return false;
-  fclose(fp);
-  return true;
-}
-}  // namespace
 
 bool MixModelManagerWrapper::ModelCompatibilityProcessFromFile(
     std::string online_model, std::string online_model_parameter,
