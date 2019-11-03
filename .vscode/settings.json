@@ -74,6 +74,7 @@
         "__tree": "cpp",
         "map": "cpp",
         "cinttypes": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "random": "cpp"
     }
 }

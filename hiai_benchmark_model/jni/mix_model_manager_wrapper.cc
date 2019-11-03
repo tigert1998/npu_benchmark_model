@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstring>
 #include <memory>
+#include <random>
 
 #include "util.h"
 
@@ -54,6 +55,10 @@ int MixModelManagerWrapper::LoadModelFromFileSync(
 
 std::vector<std::vector<float>>
 MixModelManagerWrapper::GenerateCnnRandomInput() {
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  static std::uniform_real_distribution<> dis(-1, 1);
+
   std::vector<std::vector<float>> ret;
   ret.resize(model_tensor_info->input_cnt);
   int in_n, in_c, in_h, in_w;
@@ -63,6 +68,9 @@ MixModelManagerWrapper::GenerateCnnRandomInput() {
     in_h = model_tensor_info->input_shape[pos++];
     in_w = model_tensor_info->input_shape[pos++];
     ret[i].resize(in_n * in_c * in_h * in_w);
+    for (int j = 0; j < ret[i].size(); j++) {
+      ret[i][j] = dis(gen);
+    }
   }
   return ret;
 }

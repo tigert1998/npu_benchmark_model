@@ -6,18 +6,20 @@
 #include "command_line_flags.h"
 #include "mix_model_manager_wrapper.h"
 #include "stat.h"
+#include "util.h"
 
 using std::cout;
 
 MixModelManagerWrapper mix_model_manager_wrapper;
 
 void Benchmark(const std::string &offline_model_name, int32_t num_runs,
-               float min_secs, float max_secs, float run_delay,
-               bool is_warmup) {
+               float min_secs, float max_secs, float run_delay, bool is_warmup,
+               bool debug_flag) {
   Stat<double> stat;
   printf("Running benchmark for around %d iterations%s.\n", num_runs,
          is_warmup ? " in warmup stage" : "");
   auto data_buf = mix_model_manager_wrapper.GenerateCnnRandomInput();
+  decltype(data_buf) output_buf;
 
   auto from_time = std::chrono::high_resolution_clock::now();
   decltype(from_time) to_time = from_time;
@@ -33,31 +35,47 @@ void Benchmark(const std::string &offline_model_name, int32_t num_runs,
     auto res =
         mix_model_manager_wrapper.RunModelSync(offline_model_name, data_buf);
     stat.UpdateStat(res->time_ms);
+    if (debug_flag && is_warmup && i == 0) {
+      output_buf = res->data;
+    }
 
     to_time = std::chrono::high_resolution_clock::now();
     if (to_time - from_time >=
         std::chrono::milliseconds((int)(max_secs * 1000)))
       break;
   }
+
+  if (debug_flag && is_warmup) {
+    for (int i = 0; i < data_buf.size(); i++) {
+      printf("inputs[%d] = ", i);
+      std::cout << data_buf[i] << std::endl;
+    }
+    for (int i = 0; i < output_buf.size(); i++) {
+      printf("outputs[%d] = ", i);
+      std::cout << output_buf[i] << std::endl;
+    }
+  }
+
   cout << stat << "\n\n";
 }
 
 int main(int argc, char **argv) {
-  std::string offline_model_name = "benchmark_model_name", offline_model_path;
-  std::string online_model_path, online_model_parameter;
+  std::string offline_model_name = "benchmark_model_name",
+              offline_model_path = "";
+  std::string online_model_path = "", online_model_parameter = "";
   std::string framework = "tensorflow";
-  bool mix_flag;
+  bool mix_flag = false, debug_flag = false;
   int32_t num_runs = 50, warmup_runs = 1;
   float min_secs = 1, max_secs = 150, run_delay = -1, warmup_min_secs = 0.5;
 
   if (!Flags::Parse(
           argc, argv,
-          Flag<std::string>("offline_model_name", &offline_model_name),
           Flag<std::string>("offline_model_path", &offline_model_path),
           Flag<std::string>("online_model_path", &online_model_path),
           Flag<std::string>("online_model_parameter", &online_model_parameter),
           Flag<std::string>("framework", &framework),
           Flag<bool>("mix_flag", &mix_flag),
+          Flag<bool>("debug_flag", &debug_flag),
           Flag<int32_t>("num_runs", &num_runs),
           Flag<float>(
               "min_secs", &min_secs,
@@ -100,7 +118,8 @@ int main(int argc, char **argv) {
   puts("[INFO] model loaded successfully");
 
   Benchmark(offline_model_name, warmup_runs, warmup_min_secs,
-            std::numeric_limits<float>::max(), -1, true);
-  Benchmark(offline_model_name, num_runs, min_secs, max_secs, run_delay, false);
+            std::numeric_limits<float>::max(), -1, true, debug_flag);
+  Benchmark(offline_model_name, num_runs, min_secs, max_secs, run_delay, false,
+            debug_flag);
   return 0;
 }
