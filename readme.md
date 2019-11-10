@@ -6,7 +6,7 @@ Encapsulate Huawei HiAi DDK V150 to a benchmark tool in order to test NPU infere
 
 Tested under:
 
-- host machine: ubuntu 18.04
+- host machine: ubuntu 18.04/Windows 10
 - mobile: huawei mate 10 pro
 - android: EMUI 9 (android 9)
 

@@ -9,7 +9,7 @@
 
 #include "inference_result.h"
 
-class [[deprecated]] MixModelManagerWrapper {
+class MixModelManagerWrapper {
  private:
   HIAI_MixModelManager *manager = nullptr;
   HIAI_MixTensorBuffer *input_tensor = nullptr;

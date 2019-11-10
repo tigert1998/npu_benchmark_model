@@ -1,5 +1,5 @@
 LOCAL_PATH:= $(call my-dir)
-DDK_RELATIVE_TO_JNI_PATH = ../../ddk150
+DDK_RELATIVE_TO_JNI_PATH = ../../hiai_ddk150
 DDK_PATH := $(LOCAL_PATH)/$(DDK_RELATIVE_TO_JNI_PATH)
 
 include $(CLEAR_VARS)
@@ -34,8 +34,6 @@ LOCAL_LDFLAGS += \
 LOCAL_LDLIBS += \
 	-llog
 
-LOCAL_CPPFLAGS += -std=c++17 -rpath -frtti -fexceptions -lpthread  
-# LOCAL_CPPFLAGS += -std=gnu++14 -rpath -frtti -fexceptions -lpthread  -L $(DDK_PATH)/lib64/
-# LOCAL_CPPFLAGS += -std=c++14 -rpath -frtti -fexceptions
+LOCAL_CPPFLAGS += -std=c++17 -rpath -frtti -fexceptions -lpthread
 
 include $(BUILD_EXECUTABLE)
