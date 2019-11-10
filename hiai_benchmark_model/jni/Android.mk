@@ -1,6 +1,8 @@
 LOCAL_PATH:= $(call my-dir)
 DDK_RELATIVE_TO_JNI_PATH = ../../hiai_ddk150
 DDK_PATH := $(LOCAL_PATH)/$(DDK_RELATIVE_TO_JNI_PATH)
+COMMON_RELATIVE_TO_JNI_PATH = ../../common
+COMMON_PATH := $(LOCAL_PATH)/$(COMMON_RELATIVE_TO_JNI_PATH)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := hiai
@@ -21,13 +23,16 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := hiai_benchmark_model
 
-LOCAL_C_INCLUDES += $(DDK_PATH)/include
-
+LOCAL_C_INCLUDES += \
+	$(DDK_PATH)/include \
+	$(COMMON_PATH)
+	
 LOCAL_SHARED_LIBRARIES := hiai
 
 LOCAL_SRC_FILES := \
-	main.cc mix_model_manager_wrapper.cc types.cc \
-	libai_client_so_wrapper.cc model_manager_wrapper.cc util.cc
+	main.cc mix_model_manager_wrapper.cc \
+	libai_client_so_wrapper.cc model_manager_wrapper.cc \
+	$(patsubst jni/%,%,$(wildcard $(COMMON_PATH)/*.cc))
 
 LOCAL_LDFLAGS += \
 	-Wl,-L$(DDK_PATH)/lib64

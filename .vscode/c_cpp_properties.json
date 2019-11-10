@@ -9,6 +9,8 @@
             "includePath": [
                 "${workspaceFolder}/hiai_benchmark_model/jni",
                 "${workspaceFolder}/hiai_ddk150/include",
+                "${workspaceFolder}/rknn_api_1_2_0/include",
+                "${workspaceFolder}/common",
                 "${LINUX_NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
             ],
             "defines": [],
@@ -25,6 +27,8 @@
                 "${WINDOWS_NDK_DIR}\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\local\\include",
                 "${workspaceFolder}\\hiai_benchmark_model\\jni",
                 "${workspaceFolder}\\hiai_ddk150\\include",
+                "${workspaceFolder}\\rknn_api_1_2_0\\include",
+                "${workspaceFolder}\\common",
                 "${WINDOWS_NDK_DIR}\\sources\\cxx-stl\\llvm-libc++\\include",
                 "${WINDOWS_NDK_DIR}\\sources\\cxx-stl\\llvm-libc++abi\\include",
                 "${WINDOWS_NDK_DIR}\\sysroot\\usr\\include\\arm-linux-androideabi"
