@@ -4,6 +4,13 @@
 #include <fstream>
 #include <string>
 
+#define ASSERT(value)                                                   \
+  if (!static_cast<bool>(value)) {                                      \
+    fprintf(stderr, "Assertion failed in \"%s\", line %d.\n", __FILE__, \
+            __LINE__);                                                  \
+    exit(-1);                                                           \
+  }
+
 bool FileExists(const std::string &path);
 
 template <typename T>

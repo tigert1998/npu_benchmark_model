@@ -75,6 +75,7 @@
         "map": "cpp",
         "cinttypes": "cpp",
         "list": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "numeric": "cpp"
     }
 }
