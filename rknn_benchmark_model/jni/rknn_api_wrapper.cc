@@ -4,6 +4,7 @@
 #include <random>
 #include <vector>
 
+#include "rknn_api_aux.h"
 #include "util.h"
 
 #define CHECK_RET(call_func)                                     \
@@ -16,7 +17,7 @@
   } while (0)
 
 RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
-                               bool enable_op_profiling)
+                               bool enable_op_profiling, bool debug_flag)
     : enable_op_profiling_(enable_op_profiling) {
   FILE *file = fopen(model_path.c_str(), "rb");
   if (file == nullptr) {
@@ -45,6 +46,9 @@ RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
     inputs_attrs_.push_back({.index = i});
     CHECK_RET(rknn_query(ctx_, RKNN_QUERY_INPUT_ATTR, inputs_attrs_.data() + i,
                          sizeof(rknn_tensor_attr)));
+    if (debug_flag) {
+      LOG(inputs_attrs_[i]);
+    }
   }
 
   outputs_attrs_.reserve(num_outputs_);
@@ -52,11 +56,14 @@ RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
     outputs_attrs_.push_back({.index = i});
     CHECK_RET(rknn_query(ctx_, RKNN_QUERY_OUTPUT_ATTR,
                          outputs_attrs_.data() + i, sizeof(rknn_tensor_attr)));
+    if (debug_flag) {
+      LOG(outputs_attrs_[i]);
+    }
   }
 }
 
 InferenceResult<float> RknnApiWrapper::Run(
-    const std::vector<std::vector<float>> &data) {
+    const std::vector<std::vector<float>> &data) const {
   ASSERT(data.size() == num_inputs_);
 
   std::vector<rknn_input> inputs;

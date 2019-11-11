@@ -24,9 +24,9 @@ class RknnApiWrapper {
 
  public:
   explicit RknnApiWrapper(const std::string &model_path,
-                          bool enable_op_profiling);
+                          bool enable_op_profiling, bool debug_flag);
 
-  InferenceResult<float> Run(const std::vector<std::vector<float>> &data);
+  InferenceResult<float> Run(const std::vector<std::vector<float>> &data) const;
 
   std::vector<std::vector<float>> GenerateCnnRandomInput() const;
 };

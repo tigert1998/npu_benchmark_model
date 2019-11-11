@@ -20,7 +20,7 @@ LOCAL_C_INCLUDES += \
 LOCAL_SHARED_LIBRARIES := rknn
 
 LOCAL_SRC_FILES := \
-	main.cc rknn_api_wrapper.cc \
+	main.cc rknn_api_wrapper.cc rknn_api_aux.cc \
 	$(patsubst jni/%,%,$(wildcard $(COMMON_PATH)/*.cc))
 
 LOCAL_LDFLAGS += \

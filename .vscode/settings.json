@@ -76,6 +76,7 @@
         "cinttypes": "cpp",
         "list": "cpp",
         "random": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "__memory": "cpp"
     }
 }
