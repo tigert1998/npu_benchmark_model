@@ -79,19 +79,26 @@ InferenceResult RknnApiWrapper::Run(
   CHECK_RET(rknn_inputs_set(ctx_, inputs.size(), inputs.data()));
   CHECK_RET(rknn_run(ctx_, nullptr));
 
-  InferenceResult infer_res;
-  infer_res.outputs.resize(num_outputs_);
   std::vector<rknn_output> outputs;
   outputs.reserve(num_outputs_);
   for (uint32_t i = 0; i < num_outputs_; i++) {
-    infer_res.outputs[i].resize(outputs_attrs_[i].size);
-    outputs.push_back({.want_float = true,
-                       .is_prealloc = true,
-                       .index = i,
-                       .buf = (void *)(infer_res.outputs[i].data()),
-                       .size = outputs_attrs_[i].size});
+    // convert outputs to float*
+    outputs.push_back({
+        .want_float = true,
+        .is_prealloc = false,
+    });
   }
   CHECK_RET(rknn_outputs_get(ctx_, num_outputs_, outputs.data(), nullptr));
+  InferenceResult infer_res;
+  infer_res.outputs.resize(num_outputs_);
+  for (uint32_t i = 0; i < num_outputs_; i++) {
+    ASSERT(outputs[i].index == i);
+    ASSERT(outputs[i].size == outputs_attrs_[i].n_elems * sizeof(float));
+    infer_res.outputs[i] = std::vector<float>(
+        static_cast<float *>(outputs[i].buf),
+        static_cast<float *>(outputs[i].buf) + outputs_attrs_[i].n_elems);
+  }
+  CHECK_RET(rknn_outputs_release(ctx_, num_outputs_, outputs.data()));
 
   if (!enable_op_profiling_) {
     infer_res.perf_detail = "";

@@ -7,7 +7,7 @@
 #include <vector>
 
 struct InferenceResult {
-  std::vector<std::string> outputs;
+  std::vector<std::vector<float>> outputs;
   std::string perf_detail;
   double time_ms;
 };
