@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "command_line_flags.h"
+#include "rknn_api_aux.h"
 #include "rknn_api_wrapper.h"
 #include "stat.h"
 
@@ -21,6 +22,8 @@ void Benchmark(const RknnApiWrapper &rknn_api_wrapper, int32_t num_runs,
   auto from_time = std::chrono::high_resolution_clock::now();
   decltype(from_time) to_time = from_time;
 
+  std::string perf_detail;
+
   for (int i = 0;
        i < num_runs ||
        to_time - from_time < std::chrono::milliseconds((int)(min_secs * 1000));
@@ -31,17 +34,17 @@ void Benchmark(const RknnApiWrapper &rknn_api_wrapper, int32_t num_runs,
     }
     auto res = rknn_api_wrapper.Run(data_buf);
     stat.UpdateStat(res.time_ms);
+    if (i == 0 && enable_op_profiling) perf_detail = res.perf_detail;
 
     to_time = std::chrono::high_resolution_clock::now();
     if (to_time - from_time >=
         std::chrono::milliseconds((int)(max_secs * 1000)))
       break;
-
-    if (!is_warmup && i == 0 && enable_op_profiling) {
-      std::cout << res.perf_detail << std::endl;
-    }
   }
 
+  if (!is_warmup && enable_op_profiling) {
+    cout << PerfDetailTable(perf_detail);
+  }
   cout << stat << "\n\n";
 }
 

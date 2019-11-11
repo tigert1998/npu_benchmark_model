@@ -63,3 +63,33 @@ std::ostream &operator<<(std::ostream &os, const rknn_tensor_attr &data) {
   os << "}";
   return os;
 }
+
+PerfDetailTable::PerfDetailTable(const std::string &perf_detail) {
+  auto lines = Filter(Map(Split(perf_detail, "\n"), Trim),
+                      [](const std::string &line) { return !line.empty(); });
+  titles = Map(Split(lines[0], ":"), Trim);
+  titles.pop_back();
+  
+  for (int i = 1; i < lines.size(); i++) {
+    cells.push_back(
+        Filter(Map(Split(lines[i], " "), Trim),
+               [](const std::string &line) { return !line.empty(); }));
+  }
+  std::sort(cells.begin(), cells.end(), [](auto vx, auto vy) {
+    return std::stoi(vx[0]) < std::stoi(vy[0]);
+  });
+}
+
+std::ostream &operator<<(std::ostream &os, const PerfDetailTable &table) {
+  for (int i = 0; i < table.titles.size(); i++) {
+    os << (i == 0 ? "" : ",") << table.titles[i];
+  }
+  os << std::endl;
+  for (int i = 0; i < table.cells.size(); i++) {
+    for (int j = 0; j < table.cells[i].size(); j++) {
+      os << (j == 0 ? "" : ",") << table.cells[i][j];
+    }
+    os << std::endl;
+  }
+  return os;
+}

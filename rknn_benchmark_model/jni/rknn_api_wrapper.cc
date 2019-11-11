@@ -73,8 +73,8 @@ InferenceResult<float> RknnApiWrapper::Run(
                       .buf = (void *)(data[i].data()),
                       .size = static_cast<uint32_t>(data[i].size()),
                       .pass_through = false,
-                      .type = RKNN_TENSOR_FLOAT32,
-                      .fmt = RKNN_TENSOR_NHWC});
+                      .type = inputs_attrs_[i].type,
+                      .fmt = inputs_attrs_[i].fmt});
   }
   CHECK_RET(rknn_inputs_set(ctx_, inputs.size(), inputs.data()));
   CHECK_RET(rknn_run(ctx_, nullptr));

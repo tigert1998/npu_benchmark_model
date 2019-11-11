@@ -1,6 +1,7 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -25,6 +26,26 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
   }
   os << "}";
   return os;
+}
+
+std::vector<std::string> Split(const std::string &str, const std::string &pat);
+
+std::string Trim(const std::string &str);
+
+template <typename F, template <typename...> class C, typename... Args>
+C<Args...> Filter(const C<Args...> &container, const F &func) {
+  C<Args...> ans;
+  std::copy_if(container.begin(), container.end(), std::back_inserter(ans),
+               func);
+  return ans;
+}
+
+template <typename F, template <typename...> class C, typename... Args>
+C<Args...> Map(const C<Args...> &container, const F &func) {
+  C<Args...> ans;
+  std::transform(container.begin(), container.end(), std::back_inserter(ans),
+                 func);
+  return ans;
 }
 
 #endif
