@@ -15,6 +15,10 @@ std::ostream &operator<<(std::ostream &os, const rknn_tensor_qnt_type &);
 
 std::ostream &operator<<(std::ostream &os, const rknn_tensor_attr &);
 
+std::ostream &operator<<(std::ostream &os, const rknn_devices_id &);
+
+std::ostream &operator<<(std::ostream &os, const rknn_sdk_version &);
+
 struct PerfDetailTable {
   std::vector<std::string> titles;
   std::vector<std::vector<std::string>> cells;

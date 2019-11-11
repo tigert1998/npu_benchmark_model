@@ -20,6 +20,8 @@ class RknnApiWrapper {
   bool enable_op_profiling_;
 
   std::vector<rknn_tensor_attr> inputs_attrs_, outputs_attrs_;
+  rknn_devices_id devices_;
+  rknn_sdk_version sdk_version_;
 
  public:
   explicit RknnApiWrapper(const std::string &model_path,

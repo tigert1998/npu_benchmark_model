@@ -36,6 +36,12 @@ RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
   CHECK_RET(
       rknn_init(&ctx_, model_data_.data(), model_data_.size(), init_flag));
 
+  CHECK_RET(rknn_query(ctx_, RKNN_QUERY_SDK_VERSION, &sdk_version_,
+                       sizeof(rknn_sdk_version)));
+  if (debug_flag) LOG(sdk_version_);
+  CHECK_RET(rknn_find_devices(&devices_));
+  if (debug_flag) LOG(devices_);
+
   rknn_input_output_num io_num;
   CHECK_RET(rknn_query(ctx_, RKNN_QUERY_IN_OUT_NUM, &io_num, sizeof(io_num)));
   num_inputs_ = io_num.n_input;

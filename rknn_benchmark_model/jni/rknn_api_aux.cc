@@ -64,20 +64,36 @@ std::ostream &operator<<(std::ostream &os, const rknn_tensor_attr &data) {
   return os;
 }
 
+std::ostream &operator<<(std::ostream &os, const rknn_devices_id &data) {
+  os << "{\n";
+  OS_DATA(n_devices);
+  OS_DATA_VALUE(types, std::vector<const char *>(data.types,
+                                                 data.types + data.n_devices));
+  OS_DATA_VALUE(ids,
+                std::vector<const char *>(data.ids, data.ids + data.n_devices));
+  os << "}";
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const rknn_sdk_version &data) {
+  os << "{\n";
+  OS_DATA(api_version);
+  OS_DATA(drv_version);
+  os << "}";
+  return os;
+}
+
 PerfDetailTable::PerfDetailTable(const std::string &perf_detail) {
   auto lines = Filter(Map(Split(perf_detail, "\n"), Trim),
                       [](const std::string &line) { return !line.empty(); });
   titles = Map(Split(lines[0], ":"), Trim);
   titles.pop_back();
-  
+
   for (int i = 1; i < lines.size(); i++) {
     cells.push_back(
         Filter(Map(Split(lines[i], " "), Trim),
                [](const std::string &line) { return !line.empty(); }));
   }
-  std::sort(cells.begin(), cells.end(), [](auto vx, auto vy) {
-    return std::stoi(vx[0]) < std::stoi(vy[0]);
-  });
 }
 
 std::ostream &operator<<(std::ostream &os, const PerfDetailTable &table) {
