@@ -16,6 +16,7 @@ void Benchmark(const RknnApiWrapper &rknn_api_wrapper, int32_t num_runs,
   Stat<double> stat;
   printf("Running benchmark for around %d iterations%s.\n", num_runs,
          is_warmup ? " in warmup stage" : "");
+  fflush(stdout);
   auto data_buf = rknn_api_wrapper.GenerateCnnRandomInput();
   decltype(data_buf) output_buf;
 

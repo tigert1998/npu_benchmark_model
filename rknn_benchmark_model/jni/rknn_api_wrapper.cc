@@ -62,8 +62,8 @@ RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
   }
 }
 
-InferenceResult<float> RknnApiWrapper::Run(
-    const std::vector<std::vector<float>> &data) const {
+InferenceResult RknnApiWrapper::Run(
+    const std::vector<std::string> &data) const {
   ASSERT(data.size() == num_inputs_);
 
   std::vector<rknn_input> inputs;
@@ -71,7 +71,7 @@ InferenceResult<float> RknnApiWrapper::Run(
   for (uint32_t i = 0; i < data.size(); i++) {
     inputs.push_back({.index = i,
                       .buf = (void *)(data[i].data()),
-                      .size = static_cast<uint32_t>(data[i].size()),
+                      .size = inputs_attrs_[i].size,
                       .pass_through = false,
                       .type = inputs_attrs_[i].type,
                       .fmt = inputs_attrs_[i].fmt});
@@ -79,18 +79,17 @@ InferenceResult<float> RknnApiWrapper::Run(
   CHECK_RET(rknn_inputs_set(ctx_, inputs.size(), inputs.data()));
   CHECK_RET(rknn_run(ctx_, nullptr));
 
-  InferenceResult<float> infer_res;
+  InferenceResult infer_res;
   infer_res.outputs.resize(num_outputs_);
   std::vector<rknn_output> outputs;
   outputs.reserve(num_outputs_);
   for (uint32_t i = 0; i < num_outputs_; i++) {
-    infer_res.outputs[i].resize(outputs_attrs_[i].n_elems);
+    infer_res.outputs[i].resize(outputs_attrs_[i].size);
     outputs.push_back({.want_float = true,
                        .is_prealloc = true,
                        .index = i,
-                       .buf = infer_res.outputs[i].data(),
-                       .size = static_cast<uint32_t>(
-                           infer_res.outputs[i].size() * sizeof(float))});
+                       .buf = (void *)(infer_res.outputs[i].data()),
+                       .size = outputs_attrs_[i].size});
   }
   CHECK_RET(rknn_outputs_get(ctx_, num_outputs_, outputs.data(), nullptr));
 
@@ -111,18 +110,19 @@ InferenceResult<float> RknnApiWrapper::Run(
   return infer_res;
 }
 
-std::vector<std::vector<float>> RknnApiWrapper::GenerateCnnRandomInput() const {
+std::vector<std::string> RknnApiWrapper::GenerateCnnRandomInput() const {
   static std::random_device rd;
   static std::mt19937 gen(rd());
-  static std::uniform_real_distribution<> dis(-1, 1);
+  static std::uniform_int_distribution<> dis(0, 255);
 
-  std::vector<std::vector<float>> res;
+  std::vector<std::string> res;
   res.resize(num_inputs_);
   for (int i = 0; i < num_inputs_; i++) {
-    res[i].reserve(inputs_attrs_[i].n_elems);
-    for (int j = 0; j < inputs_attrs_[i].n_elems; j++)
-      res[i].push_back(dis(gen));
+    res[i].reserve(inputs_attrs_[i].size);
+    for (int j = 0; j < inputs_attrs_[i].size; j++) res[i].push_back(dis(gen));
   }
 
   return res;
 }
+
+RknnApiWrapper::~RknnApiWrapper() { rknn_destroy(ctx_); }

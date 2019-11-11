@@ -6,9 +6,8 @@
 #include <string>
 #include <vector>
 
-template <typename T>
 struct InferenceResult {
-  std::vector<std::vector<T>> outputs;
+  std::vector<std::string> outputs;
   std::string perf_detail;
   double time_ms;
 };
@@ -26,9 +25,11 @@ class RknnApiWrapper {
   explicit RknnApiWrapper(const std::string &model_path,
                           bool enable_op_profiling, bool debug_flag);
 
-  InferenceResult<float> Run(const std::vector<std::vector<float>> &data) const;
+  ~RknnApiWrapper();
 
-  std::vector<std::vector<float>> GenerateCnnRandomInput() const;
+  InferenceResult Run(const std::vector<std::string> &data) const;
+
+  std::vector<std::string> GenerateCnnRandomInput() const;
 };
 
 #endif
