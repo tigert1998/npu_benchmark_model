@@ -2,13 +2,14 @@
 #define RKNN_API_WRAPPER_
 
 #include "rknn_api.h"
+#include "rknn_api_aux.h"
 
 #include <string>
 #include <vector>
 
 struct InferenceResult {
   std::vector<std::vector<float>> outputs;
-  std::string perf_detail;
+  PerfDetailTable perf_detail;
   double time_ms;
 };
 

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "rknn_api.h"
+#include "stat.h"
 
 std::ostream &operator<<(std::ostream &os, const rknn_tensor_format &);
 
@@ -22,8 +23,12 @@ std::ostream &operator<<(std::ostream &os, const rknn_sdk_version &);
 struct PerfDetailTable {
   std::vector<std::string> titles;
   std::vector<std::vector<std::string>> cells;
+  std::vector<Stat<double>> stats;
 
+  PerfDetailTable() = default;
   explicit PerfDetailTable(const std::string &perf_detail);
+
+  void Merge(const PerfDetailTable &);
 };
 
 std::ostream &operator<<(std::ostream &os, const PerfDetailTable &);

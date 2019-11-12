@@ -28,9 +28,20 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
   return os;
 }
 
-std::vector<std::string> Split(const std::string &str, const std::string &pat);
+std::vector<std::string> Split(const std::string &str, const std::string &sep);
 
 std::string Trim(const std::string &str);
+
+template <template <typename...> class C, typename... Args>
+std::string Join(const std::string &sep, const C<Args...> &container) {
+  if (container.begin() == container.end()) return "";
+  std::string ans = std::string(*container.begin());
+  for (auto iter = std::next(container.begin()); iter != container.end();
+       iter = std::next(iter)) {
+    ans += sep + std::string(*iter);
+  }
+  return ans;
+}
 
 template <typename F, template <typename...> class C, typename... Args>
 C<Args...> Filter(const C<Args...> &container, const F &func) {
@@ -41,8 +52,8 @@ C<Args...> Filter(const C<Args...> &container, const F &func) {
 }
 
 template <typename F, template <typename...> class C, typename... Args>
-C<Args...> Map(const C<Args...> &container, const F &func) {
-  C<Args...> ans;
+auto Map(const C<Args...> &container, const F &func) {
+  C<std::invoke_result_t<F, typename C<Args...>::value_type>> ans;
   std::transform(container.begin(), container.end(), std::back_inserter(ans),
                  func);
   return ans;

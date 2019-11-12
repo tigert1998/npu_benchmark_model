@@ -89,10 +89,30 @@ PerfDetailTable::PerfDetailTable(const std::string &perf_detail) {
   titles = Map(Split(lines[0], ":"), Trim);
   titles.pop_back();
 
+  cells.reserve(lines.size() - 1);
   for (int i = 1; i < lines.size(); i++) {
     cells.push_back(
         Filter(Map(Split(lines[i], " "), Trim),
                [](const std::string &line) { return !line.empty(); }));
+  }
+
+  // remove Time(us)
+  stats.resize(cells.size());
+  titles.pop_back();
+  for (int i = 0; i < cells.size(); i++) {
+    double time_us = std::stof(cells[i].back());
+    stats[i].UpdateStat(time_us);
+    cells[i].pop_back();
+  }
+}
+
+void PerfDetailTable::Merge(const PerfDetailTable &perf_detail) {
+  ASSERT(cells.size() == perf_detail.cells.size());
+  for (int i = 0; i < cells.size(); i++) {
+    // assert id equation
+    ASSERT(cells[i][0] == perf_detail.cells[i][0]);
+    ASSERT(perf_detail.stats[i].count() == 1);
+    stats[i].UpdateStat(perf_detail.stats[i].first());
   }
 }
 
@@ -100,11 +120,19 @@ std::ostream &operator<<(std::ostream &os, const PerfDetailTable &table) {
   for (int i = 0; i < table.titles.size(); i++) {
     os << (i == 0 ? "" : ",") << table.titles[i];
   }
+  os << "," << Join(",", std::vector({"avg(us)", "min", "max", "std"}));
   os << std::endl;
+
   for (int i = 0; i < table.cells.size(); i++) {
     for (int j = 0; j < table.cells[i].size(); j++) {
       os << (j == 0 ? "" : ",") << table.cells[i][j];
     }
+    os << ","
+       << Join(",",
+               Map(std::vector{table.stats[i].avg(), table.stats[i].min(),
+                               table.stats[i].max(),
+                               table.stats[i].std_deviation()},
+                   [](double x) -> std::string { return std::to_string(x); }));
     os << std::endl;
   }
   return os;

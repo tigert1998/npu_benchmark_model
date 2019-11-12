@@ -7,14 +7,14 @@ bool FileExists(const std::string &path) {
   return true;
 }
 
-std::vector<std::string> Split(const std::string &str, const std::string &pat) {
+std::vector<std::string> Split(const std::string &str, const std::string &sep) {
   std::vector<std::string> ans;
   uint32_t pre_p = 0;
-  auto p = str.find(pat);
+  auto p = str.find(sep);
   while (p != std::string::npos) {
     ans.push_back(str.substr(pre_p, p - pre_p));
-    pre_p = p + pat.size();
-    p = str.find(pat, pre_p);
+    pre_p = p + sep.size();
+    p = str.find(sep, pre_p);
   }
   ans.push_back(str.substr(pre_p));
   return ans;

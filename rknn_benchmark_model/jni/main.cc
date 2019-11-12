@@ -1,10 +1,10 @@
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <thread>
 
 #include "command_line_flags.h"
-#include "rknn_api_aux.h"
 #include "rknn_api_wrapper.h"
 #include "stat.h"
 
@@ -12,7 +12,8 @@ using std::cout;
 
 void Benchmark(const RknnApiWrapper &rknn_api_wrapper, int32_t num_runs,
                float min_secs, float max_secs, float run_delay, bool is_warmup,
-               bool enable_op_profiling) {
+               bool enable_op_profiling,
+               const std::string &op_profiling_dump_path) {
   Stat<double> stat;
   printf("Running benchmark for around %d iterations%s.\n", num_runs,
          is_warmup ? " in warmup stage" : "");
@@ -23,7 +24,7 @@ void Benchmark(const RknnApiWrapper &rknn_api_wrapper, int32_t num_runs,
   auto from_time = std::chrono::high_resolution_clock::now();
   decltype(from_time) to_time = from_time;
 
-  std::string perf_detail;
+  PerfDetailTable perf_detail;
 
   for (int i = 0;
        i < num_runs ||
@@ -35,7 +36,13 @@ void Benchmark(const RknnApiWrapper &rknn_api_wrapper, int32_t num_runs,
     }
     auto res = rknn_api_wrapper.Run(data_buf);
     stat.UpdateStat(res.time_ms);
-    if (i == 0 && enable_op_profiling) perf_detail = res.perf_detail;
+    if (!is_warmup && enable_op_profiling) {
+      if (i == 0) {
+        perf_detail = res.perf_detail;
+      } else {
+        perf_detail.Merge(res.perf_detail);
+      }
+    }
 
     to_time = std::chrono::high_resolution_clock::now();
     if (to_time - from_time >=
@@ -44,13 +51,22 @@ void Benchmark(const RknnApiWrapper &rknn_api_wrapper, int32_t num_runs,
   }
 
   if (!is_warmup && enable_op_profiling) {
-    cout << PerfDetailTable(perf_detail);
+    if (op_profiling_dump_path != "") {
+      std::ofstream ofs(op_profiling_dump_path);
+      if (ofs.is_open())
+        ofs << perf_detail;
+      else {
+        printf("[WARNING] cannot open %s\n", op_profiling_dump_path.c_str());
+      }
+    } else {
+      cout << perf_detail;
+    }
   }
   cout << stat << "\n\n";
 }
 
 int main(int argc, char **argv) {
-  std::string model_path = "";
+  std::string model_path = "", op_profiling_dump_path = "";
   bool debug_flag = false, enable_op_profiling = false;
   int32_t num_runs = 50, warmup_runs = 1;
   float min_secs = 1, max_secs = 150, run_delay = -1, warmup_min_secs = 0.5;
@@ -76,7 +92,9 @@ int main(int argc, char **argv) {
                       "making the actual number of warm-up runs to be greater "
                       "than warmup_runs"),
           Flag<bool>("enable_op_profiling", &enable_op_profiling,
-                     "enable op profiling"))) {
+                     "enable op profiling"),
+          Flag<std::string>("op_profiling_dump_path",
+                            &op_profiling_dump_path))) {
     puts("[ERROR] invalid arguments");
     return -1;
   }
@@ -86,9 +104,10 @@ int main(int argc, char **argv) {
                                     debug_flag);
 
     Benchmark(rknn_api_wrapper, warmup_runs, warmup_min_secs,
-              std::numeric_limits<float>::max(), -1, true, enable_op_profiling);
+              std::numeric_limits<float>::max(), -1, true, enable_op_profiling,
+              op_profiling_dump_path);
     Benchmark(rknn_api_wrapper, num_runs, min_secs, max_secs, run_delay, false,
-              enable_op_profiling);
+              enable_op_profiling, op_profiling_dump_path);
   } catch (std::runtime_error error) {
     std::cout << "[ERROR] " << error.what() << std::endl;
     return -1;

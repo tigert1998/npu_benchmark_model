@@ -126,14 +126,12 @@ InferenceResult RknnApiWrapper::Run(
   }
   CHECK_RET(rknn_outputs_release(ctx_, num_outputs_, outputs.data()));
 
-  if (!enable_op_profiling_) {
-    infer_res.perf_detail = "";
-  } else {
+  if (enable_op_profiling_) {
     rknn_perf_detail perf_detail;
     CHECK_RET(rknn_query(ctx_, RKNN_QUERY_PERF_DETAIL, &perf_detail,
                          sizeof(rknn_perf_detail)));
-    infer_res.perf_detail = std::string(
-        perf_detail.perf_data, perf_detail.perf_data + perf_detail.data_len);
+    infer_res.perf_detail = PerfDetailTable(std::string(
+        perf_detail.perf_data, perf_detail.perf_data + perf_detail.data_len));
   }
   rknn_perf_run perf_run;
   CHECK_RET(
