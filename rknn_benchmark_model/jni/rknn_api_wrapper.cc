@@ -7,13 +7,33 @@
 #include "rknn_api_aux.h"
 #include "util.h"
 
-#define CHECK_RET(call_func)                                     \
-  do {                                                           \
-    auto ret = call_func;                                        \
-    if (ret != 0) {                                              \
-      throw std::runtime_error(std::string(#call_func) + " = " + \
-                               std::to_string(ret));             \
-    }                                                            \
+#define CASE(case_item, res) \
+  case case_item: {          \
+    res = #case_item;        \
+    break;                   \
+  }
+
+#define CHECK_RET(call_func)                                               \
+  do {                                                                     \
+    auto ret = call_func;                                                  \
+    if (ret != 0) {                                                        \
+      std::string ret_str = "";                                            \
+      switch (ret) {                                                       \
+        CASE(RKNN_SUCC, ret_str)                                           \
+        CASE(RKNN_ERR_FAIL, ret_str)                                       \
+        CASE(RKNN_ERR_TIMEOUT, ret_str)                                    \
+        CASE(RKNN_ERR_DEVICE_UNAVAILABLE, ret_str)                         \
+        CASE(RKNN_ERR_MALLOC_FAIL, ret_str)                                \
+        CASE(RKNN_ERR_PARAM_INVALID, ret_str)                              \
+        CASE(RKNN_ERR_MODEL_INVALID, ret_str)                              \
+        CASE(RKNN_ERR_CTX_INVALID, ret_str)                                \
+        CASE(RKNN_ERR_INPUT_INVALID, ret_str)                              \
+        CASE(RKNN_ERR_OUTPUT_INVALID, ret_str)                             \
+        CASE(RKNN_ERR_DEVICE_UNMATCH, ret_str)                             \
+        CASE(RKNN_ERR_INCOMPATILE_PRE_COMPILE_MODEL, ret_str)              \
+      }                                                                    \
+      throw std::runtime_error(std::string(#call_func) + " = " + ret_str); \
+    }                                                                      \
   } while (0)
 
 RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
