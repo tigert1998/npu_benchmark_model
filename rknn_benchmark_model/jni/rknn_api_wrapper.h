@@ -30,9 +30,9 @@ class RknnApiWrapper {
 
   ~RknnApiWrapper();
 
-  InferenceResult Run(const std::vector<std::string> &data) const;
+  InferenceResult Run(const std::vector<std::vector<float>> &data) const;
 
-  std::vector<std::string> GenerateCnnRandomInput() const;
+  std::vector<std::vector<float>> GenerateCnnRandomInput() const;
 };
 
 #endif
