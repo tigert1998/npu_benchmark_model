@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -13,8 +14,6 @@
             __LINE__);                                                  \
     exit(-1);                                                           \
   }
-
-#define LOG(value) std::cout << #value " = " << value << std::endl;
 
 bool FileExists(const std::string &path);
 
@@ -28,7 +27,9 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &vec) {
   return os;
 }
 
-std::vector<std::string> Split(const std::string &str, const std::string &sep);
+void Timeout(const std::function<void(void)> &task, double max_secs);
+
+std::vector<std::string> Split(const std::string &sep, const std::string &str);
 
 std::string Trim(const std::string &str);
 
@@ -44,7 +45,7 @@ std::string Join(const std::string &sep, const C<Args...> &container) {
 }
 
 template <typename F, template <typename...> class C, typename... Args>
-C<Args...> Filter(const C<Args...> &container, const F &func) {
+C<Args...> Filter(const F &func, const C<Args...> &container) {
   C<Args...> ans;
   std::copy_if(container.begin(), container.end(), std::back_inserter(ans),
                func);
@@ -52,7 +53,7 @@ C<Args...> Filter(const C<Args...> &container, const F &func) {
 }
 
 template <typename F, template <typename...> class C, typename... Args>
-auto Map(const C<Args...> &container, const F &func) {
+auto Map(const F &func, const C<Args...> &container) {
   C<std::invoke_result_t<F, typename C<Args...>::value_type>> ans;
   std::transform(container.begin(), container.end(), std::back_inserter(ans),
                  func);

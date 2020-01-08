@@ -4,6 +4,7 @@
 #include <random>
 #include <vector>
 
+#include "dbg.h"
 #include "rknn_api_aux.h"
 #include "util.h"
 
@@ -58,9 +59,9 @@ RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
 
   CHECK_RET(rknn_query(ctx_, RKNN_QUERY_SDK_VERSION, &sdk_version_,
                        sizeof(rknn_sdk_version)));
-  if (debug_flag) LOG(sdk_version_);
+  if (debug_flag) dbg(sdk_version_);
   CHECK_RET(rknn_find_devices(&devices_));
-  if (debug_flag) LOG(devices_);
+  if (debug_flag) dbg(devices_);
 
   rknn_input_output_num io_num;
   CHECK_RET(rknn_query(ctx_, RKNN_QUERY_IN_OUT_NUM, &io_num, sizeof(io_num)));
@@ -73,7 +74,7 @@ RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
     CHECK_RET(rknn_query(ctx_, RKNN_QUERY_INPUT_ATTR, inputs_attrs_.data() + i,
                          sizeof(rknn_tensor_attr)));
     if (debug_flag) {
-      LOG(inputs_attrs_[i]);
+      dbg(inputs_attrs_[i]);
     }
   }
 
@@ -83,7 +84,7 @@ RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
     CHECK_RET(rknn_query(ctx_, RKNN_QUERY_OUTPUT_ATTR,
                          outputs_attrs_.data() + i, sizeof(rknn_tensor_attr)));
     if (debug_flag) {
-      LOG(outputs_attrs_[i]);
+      dbg(outputs_attrs_[i]);
     }
   }
 }

@@ -77,6 +77,8 @@
         "list": "cpp",
         "random": "cpp",
         "numeric": "cpp",
-        "__memory": "cpp"
+        "__memory": "cpp",
+        "variant": "cpp",
+        "future": "cpp"
     }
 }

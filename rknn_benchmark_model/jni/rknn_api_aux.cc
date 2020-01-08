@@ -84,16 +84,16 @@ std::ostream &operator<<(std::ostream &os, const rknn_sdk_version &data) {
 }
 
 PerfDetailTable::PerfDetailTable(const std::string &perf_detail) {
-  auto lines = Filter(Map(Split(perf_detail, "\n"), Trim),
-                      [](const std::string &line) { return !line.empty(); });
-  titles = Map(Split(lines[0], ":"), Trim);
+  auto lines = Filter([](const std::string &line) { return !line.empty(); },
+                      Map(Trim, Split("\n", perf_detail)));
+  titles = Map(Trim, Split(":", lines[0]));
   titles.pop_back();
 
   cells.reserve(lines.size() - 1);
   for (int i = 1; i < lines.size(); i++) {
     cells.push_back(
-        Filter(Map(Split(lines[i], " "), Trim),
-               [](const std::string &line) { return !line.empty(); }));
+        Filter([](const std::string &line) { return !line.empty(); },
+               Map(Trim, Split(" ", lines[i]))));
   }
 
   // remove Time(us)
@@ -129,10 +129,10 @@ std::ostream &operator<<(std::ostream &os, const PerfDetailTable &table) {
     }
     os << ","
        << Join(",",
-               Map(std::vector{table.stats[i].avg(), table.stats[i].min(),
+               Map([](double x) -> std::string { return std::to_string(x); },
+                   std::vector{table.stats[i].avg(), table.stats[i].min(),
                                table.stats[i].max(),
-                               table.stats[i].std_deviation()},
-                   [](double x) -> std::string { return std::to_string(x); }));
+                               table.stats[i].std_deviation()}));
     os << std::endl;
   }
   return os;

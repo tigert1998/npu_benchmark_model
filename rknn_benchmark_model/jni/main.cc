@@ -1,12 +1,14 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <thread>
 
 #include "command_line_flags.h"
 #include "rknn_api_wrapper.h"
 #include "stat.h"
+#include "util.h"
 
 using std::cout;
 
@@ -100,13 +102,18 @@ int main(int argc, char **argv) {
   }
 
   try {
-    RknnApiWrapper rknn_api_wrapper(model_path, enable_op_profiling,
-                                    debug_flag);
+    std::unique_ptr<RknnApiWrapper> rknn_api_wrapper;
+    Timeout(
+        [&]() {
+          rknn_api_wrapper = std::make_unique<RknnApiWrapper>(
+              model_path, enable_op_profiling, debug_flag);
+        },
+        3 * 60);
 
-    Benchmark(rknn_api_wrapper, warmup_runs, warmup_min_secs,
+    Benchmark(*rknn_api_wrapper, warmup_runs, warmup_min_secs,
               std::numeric_limits<float>::max(), -1, true, enable_op_profiling,
               op_profiling_dump_path);
-    Benchmark(rknn_api_wrapper, num_runs, min_secs, max_secs, run_delay, false,
+    Benchmark(*rknn_api_wrapper, num_runs, min_secs, max_secs, run_delay, false,
               enable_op_profiling, op_profiling_dump_path);
   } catch (std::runtime_error error) {
     std::cout << "[ERROR] " << error.what() << std::endl;
