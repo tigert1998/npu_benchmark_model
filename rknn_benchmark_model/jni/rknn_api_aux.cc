@@ -2,6 +2,40 @@
 
 #include "util.h"
 
+std::string RknnReturnCodeToString(int32_t ret) {
+#define CASE(enum_item) \
+  case enum_item: {     \
+    return #enum_item;  \
+  }
+
+  switch (ret) {
+    CASE(RKNN_SUCC)
+    CASE(RKNN_ERR_FAIL)
+    CASE(RKNN_ERR_TIMEOUT)
+    CASE(RKNN_ERR_DEVICE_UNAVAILABLE)
+    CASE(RKNN_ERR_MALLOC_FAIL)
+    CASE(RKNN_ERR_PARAM_INVALID)
+    CASE(RKNN_ERR_MODEL_INVALID)
+    CASE(RKNN_ERR_CTX_INVALID)
+    CASE(RKNN_ERR_INPUT_INVALID)
+    CASE(RKNN_ERR_OUTPUT_INVALID)
+    CASE(RKNN_ERR_DEVICE_UNMATCH)
+    CASE(RKNN_ERR_INCOMPATILE_PRE_COMPILE_MODEL)
+  }
+  return std::to_string(ret);
+
+#undef CASE
+}
+
+RknnError::RknnError(std::int32_t code, std::string call_func_str)
+    : code_(code), call_func_str_(call_func_str) {}
+
+std::int32_t RknnError::code() const { return code_; }
+
+const char *RknnError::what() const noexcept {
+  return (call_func_str_ + " = " + RknnReturnCodeToString(code_)).c_str();
+}
+
 #define CASE(enum_item) \
   case enum_item: {     \
     os << #enum_item;   \

@@ -101,23 +101,35 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  try {
-    std::unique_ptr<RknnApiWrapper> rknn_api_wrapper;
-    Timeout(
-        [&]() {
-          rknn_api_wrapper = std::make_unique<RknnApiWrapper>(
-              model_path, enable_op_profiling, debug_flag);
-        },
-        3 * 60);
+  do {
+    try {
+      std::unique_ptr<RknnApiWrapper> rknn_api_wrapper;
+      Timeout(
+          [&]() {
+            rknn_api_wrapper = std::make_unique<RknnApiWrapper>(
+                model_path, enable_op_profiling, debug_flag);
+          },
+          3 * 60);
 
-    Benchmark(*rknn_api_wrapper, warmup_runs, warmup_min_secs,
-              std::numeric_limits<float>::max(), -1, true, enable_op_profiling,
-              op_profiling_dump_path);
-    Benchmark(*rknn_api_wrapper, num_runs, min_secs, max_secs, run_delay, false,
-              enable_op_profiling, op_profiling_dump_path);
-  } catch (std::runtime_error error) {
-    std::cout << "[ERROR] " << error.what() << std::endl;
-    return -1;
-  }
+      Benchmark(*rknn_api_wrapper, warmup_runs, warmup_min_secs,
+                std::numeric_limits<float>::max(), -1, true,
+                enable_op_profiling, op_profiling_dump_path);
+      Benchmark(*rknn_api_wrapper, num_runs, min_secs, max_secs, run_delay,
+                false, enable_op_profiling, op_profiling_dump_path);
+    } catch (std::runtime_error error) {
+      std::cerr << "[ERROR] " << error.what() << std::endl;
+      return -1;
+    } catch (RknnError error) {
+      std::cerr << "[ERROR] " << error.what() << std::endl;
+      if (error.code() == RKNN_ERR_DEVICE_UNAVAILABLE) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::cerr << "[WARN] Retrying..." << std::endl;
+        continue;
+      } else {
+        return -1;
+      }
+    }
+    break;
+  } while (1);
   return 0;
 }

@@ -33,4 +33,19 @@ struct PerfDetailTable {
 
 std::ostream &operator<<(std::ostream &os, const PerfDetailTable &);
 
+std::string RknnReturnCodeToString(int32_t ret);
+
+class RknnError : public std::exception {
+ private:
+  std::int32_t code_;
+  std::string call_func_str_;
+
+ public:
+  RknnError(std::int32_t code, std::string call_func_str);
+
+  std::int32_t code() const;
+
+  const char *what() const noexcept;
+};
+
 #endif
