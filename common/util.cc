@@ -1,10 +1,10 @@
 #include "util.h"
 
 #include <chrono>
+#include <mutex>
 #include <thread>
 
 #include <sys/types.h>
-#include <unistd.h>
 
 bool FileExists(const std::string &path) {
   FILE *fp = fopen(path.c_str(), "r+");

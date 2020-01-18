@@ -79,6 +79,22 @@
         "numeric": "cpp",
         "__memory": "cpp",
         "variant": "cpp",
-        "future": "cpp"
-    }
+        "future": "cpp",
+        "concepts": "cpp",
+        "xfacet": "cpp",
+        "xhash": "cpp",
+        "xiosbase": "cpp",
+        "xlocale": "cpp",
+        "xlocinfo": "cpp",
+        "xlocnum": "cpp",
+        "xmemory": "cpp",
+        "xstddef": "cpp",
+        "xstring": "cpp",
+        "xtr1common": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp",
+        "xlocmon": "cpp",
+        "xloctime": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
 }
