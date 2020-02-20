@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
   // latency
   int32_t num_runs = 50, warmup_runs = 1;
   float min_secs = 1, max_secs = 150, run_delay = -1, warmup_min_secs = 0.5;
-  bool enable_op_profiling = false;
+  bool enable_op_profiling = false, disable_timeout = false;
   std::string op_profiling_dump_path = "";
 
   if (!Flags::Parse(
@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
           Flag<std::string>("benchmark_type", &benchmark_type,
                             "accuracy or latency"),
           Flag<bool>("debug_flag", &debug_flag),
+          Flag<bool>("disable_timeout", &disable_timeout),
 
           // accuracy
           Flag<std::string>(
@@ -102,9 +103,9 @@ int main(int argc, char **argv) {
                  ground_truth_labels, model_output_labels, output_file_path,
                  num_images, num_ranks);
   } else if (benchmark_type == "latency") {
-    LatencyTest(model_path, debug_flag, warmup_runs, warmup_min_secs, num_runs,
-                min_secs, max_secs, run_delay, enable_op_profiling,
-                op_profiling_dump_path);
+    LatencyTest(model_path, debug_flag, disable_timeout, warmup_runs,
+                warmup_min_secs, num_runs, min_secs, max_secs, run_delay,
+                enable_op_profiling, op_profiling_dump_path);
   }
 
   return 0;

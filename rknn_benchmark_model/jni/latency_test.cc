@@ -69,19 +69,24 @@ void Benchmark(const RknnApiWrapper &rknn_api_wrapper, int32_t num_runs,
 }  // namespace
 
 void LatencyTest(const std::string &model_path, bool debug_flag,
-                 int32_t warmup_runs, double warmup_min_secs, int32_t num_runs,
-                 double min_secs, double max_secs, double run_delay,
-                 bool enable_op_profiling,
+                 bool disable_timeout, int32_t warmup_runs,
+                 double warmup_min_secs, int32_t num_runs, double min_secs,
+                 double max_secs, double run_delay, bool enable_op_profiling,
                  const std::string &op_profiling_dump_path) {
   do {
     try {
       std::unique_ptr<RknnApiWrapper> rknn_api_wrapper;
-      Timeout(
-          [&]() {
-            rknn_api_wrapper = std::make_unique<RknnApiWrapper>(
-                model_path, enable_op_profiling, debug_flag);
-          },
-          3 * 60);
+      if (disable_timeout) {
+        rknn_api_wrapper = std::make_unique<RknnApiWrapper>(
+            model_path, enable_op_profiling, debug_flag);
+      } else {
+        Timeout(
+            [&]() {
+              rknn_api_wrapper = std::make_unique<RknnApiWrapper>(
+                  model_path, enable_op_profiling, debug_flag);
+            },
+            3 * 60);
+      }
 
       Benchmark(*rknn_api_wrapper, warmup_runs, warmup_min_secs,
                 std::numeric_limits<float>::max(), -1, true,
