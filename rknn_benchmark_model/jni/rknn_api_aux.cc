@@ -128,7 +128,17 @@ PerfDetailTable::PerfDetailTable(const std::string &perf_detail) {
     cells.push_back(
         Filter([](const std::string &line) { return !line.empty(); },
                Map(Trim, Split(" ", lines[i]))));
+    auto &cells_back = cells.back();
+
+    // fix the bug in perf_detail
+    if (cells_back[3] == "unkown" && cells_back[4] == "operation" &&
+        cells_back[5] == "type") {
+      cells_back[3] = "unknown_operation_type";
+      cells_back.erase(cells_back.begin() + 4, cells_back.begin() + 6);
+    }
   }
+  for (int i = 1; i < cells.size(); i++)
+    ASSERT(cells[i].size() == cells[0].size());
 
   // remove Time(us)
   stats.resize(cells.size());
