@@ -137,24 +137,44 @@ PerfDetailTable::PerfDetailTable(const std::string &perf_detail) {
       cells_back.erase(cells_back.begin() + 4, cells_back.begin() + 6);
     }
   }
-  for (int i = 1; i < cells.size(); i++)
-    ASSERT(cells[i].size() == cells[0].size());
 
-  // remove Time(us)
+  int tot = 0;
+  std::vector<double> durations;
+  durations.reserve(cells.size());
+  for (int i = 0; i < cells.size(); i++) {
+    double time_us = std::stof(cells[i].back());
+    cells[i].pop_back();
+
+    int j;
+    for (j = 0; j < tot; j++) {
+      if (cells[i] == cells[j]) break;
+    }
+
+    if (j < tot) {
+      // merge
+      durations[j] += time_us;
+      continue;
+    }
+    if (tot < i) {
+      cells[tot] = cells[i];
+    }
+    tot += 1;
+    durations.push_back(time_us);
+  }
+
+  cells.resize(tot);
+
   stats.resize(cells.size());
   titles.pop_back();
   for (int i = 0; i < cells.size(); i++) {
-    double time_us = std::stof(cells[i].back());
-    stats[i].UpdateStat(time_us);
-    cells[i].pop_back();
+    stats[i].UpdateStat(durations[i]);
   }
 }
 
 void PerfDetailTable::Merge(const PerfDetailTable &perf_detail) {
   ASSERT(cells.size() == perf_detail.cells.size());
   for (int i = 0; i < cells.size(); i++) {
-    // assert id equation
-    ASSERT(cells[i][0] == perf_detail.cells[i][0]);
+    ASSERT(cells[i] == perf_detail.cells[i]);
     ASSERT(perf_detail.stats[i].count() == 1);
     stats[i].UpdateStat(perf_detail.stats[i].first());
   }
