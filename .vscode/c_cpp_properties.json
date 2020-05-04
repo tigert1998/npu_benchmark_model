@@ -1,6 +1,6 @@
 {
     "env": {
-        "LINUX_NDK_DIR": "/opt/ndk/20.0.5594570/",
+        "LINUX_NDK_DIR": "/data/ticao/Android/Sdk/ndk-bundle",
         "WINDOWS_NDK_DIR": "~/AppData/Local/Android/Sdk/ndk-bundle/"
     },
     "configurations": [
@@ -11,7 +11,7 @@
                 "${workspaceFolder}/hiai_ddk150/include",
                 "${workspaceFolder}/rknn_api_1_2_0/include",
                 "${workspaceFolder}/common",
-                "${workspaceFolder}/third_party/dbg",
+                "${workspaceFolder}/third_party/dbg-macro",
                 "${workspaceFolder}/third_party/stb",
                 "${LINUX_NDK_DIR}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
             ],
