@@ -28,14 +28,14 @@ RknnApiWrapper::RknnApiWrapper(const std::string &model_path,
   model_data_.resize(ftell(file));
   fseek(file, 0, SEEK_SET);
   if (model_data_.size() !=
-      fread(model_data_.data(), 1, model_data_.size(), file)) {
+      fread((void *)model_data_.data(), 1, model_data_.size(), file)) {
     throw std::runtime_error("fail to read model at " + model_path);
   }
 
   auto init_flag = RKNN_FLAG_PRIOR_HIGH |
                    (enable_op_profiling ? RKNN_FLAG_COLLECT_PERF_MASK : 0);
-  CHECK_RET(
-      rknn_init(&ctx_, model_data_.data(), model_data_.size(), init_flag));
+  CHECK_RET(rknn_init(&ctx_, (void *)model_data_.data(), model_data_.size(),
+                      init_flag));
 
   CHECK_RET(rknn_query(ctx_, RKNN_QUERY_SDK_VERSION, &sdk_version_,
                        sizeof(rknn_sdk_version)));

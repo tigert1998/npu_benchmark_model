@@ -118,8 +118,9 @@ std::ostream &operator<<(std::ostream &os, const rknn_sdk_version &data) {
 }
 
 PerfDetailTable::PerfDetailTable(const std::string &perf_detail) {
-  auto lines = Filter([](const std::string &line) { return !line.empty(); },
-                      Map(Trim, Split("\n", perf_detail)));
+  std::vector<std::string> lines =
+      Filter([](const std::string &line) -> bool { return !line.empty(); },
+             Map(Trim, Split("\n", perf_detail)));
   titles = Map(Trim, Split(":", lines[0]));
   titles.pop_back();
 

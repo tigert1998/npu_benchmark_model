@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #define ASSERT(value)                                                   \
@@ -54,7 +55,14 @@ C<Args...> Filter(const F &func, const C<Args...> &container) {
 
 template <typename F, template <typename...> class C, typename... Args>
 auto Map(const F &func, const C<Args...> &container) {
-  C<std::invoke_result_t<F, typename C<Args...>::value_type>> ans;
+#if __cplusplus >= 201703L
+  using ResultType = std::invoke_result_t<F, typename C<Args...>::value_type>;
+#else
+  using ResultType = typename std::result_of<decltype(func)(
+      typename C<Args...>::value_type)>::type;
+#endif
+
+  C<ResultType> ans;
   std::transform(container.begin(), container.end(), std::back_inserter(ans),
                  func);
   return ans;
