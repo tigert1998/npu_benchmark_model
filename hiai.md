@@ -1,7 +1,5 @@
 # HIAI benchmark model
 
-Encapsulate Huawei HiAi DDK V150 to a benchmark tool in order to test NPU inference speed.
-
 ## Environment
 
 Tested under:
@@ -12,15 +10,9 @@ Tested under:
 
 ## Build
 
-1. `git lfs pull` (in order to pull shared libraries stored with  `git-lfs`)
+1. `ndk-build -C hiai_benchmark_model`
 
-2. Configure android sdk, ndk and `ndk-build` which is directly in the folder of ndk
-   - Linux: ndk is located where you installed it
-   - Windows: ndk usually lies in `~\AppData\Local\Android\Sdk\ndk-bundle`
-   
-3. `ndk-build -C hiai_benchmark_model`
-
-4. ```
+2. ```
    cd hiai_benchmark_model/obj/local/arm64-v8a/
    adb push hiai_benchmark_model ${MOBILE_LOCATION}
    adb push libhiai.so ${MOBILE_LOCATION}
